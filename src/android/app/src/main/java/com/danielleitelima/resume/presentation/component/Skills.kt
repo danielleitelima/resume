@@ -31,7 +31,7 @@ fun Skills(skills: List<Skill>){
         Spacer(modifier = Modifier.height(24.dp))
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalArrangement = Arrangement.Center,
         ) {
             skills.forEach { skill ->
                 SkillView(
