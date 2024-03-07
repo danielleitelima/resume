@@ -19,24 +19,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.danielleitelima.resume.presentation.theme.typographyFamily
 
 @Composable
 fun Footer(
-    modifier: Modifier = Modifier.fillMaxWidth()
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier
-            .background(MaterialTheme.colorScheme.secondary)
-            .padding(top = 12.dp, bottom = 32.dp, start = 24.dp, end = 24.dp),
+        modifier = modifier.fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(top = 24.dp, bottom = 32.dp, start = 24.dp, end = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = "Let's talk!",
-            style = MaterialTheme.typographyFamily.textXl.medium,
-            color = MaterialTheme.colorScheme.onSecondary
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,

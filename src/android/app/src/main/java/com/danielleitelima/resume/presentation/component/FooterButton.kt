@@ -30,7 +30,7 @@ fun FooterButton(
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.onSecondary
+            color = MaterialTheme.colorScheme.onSurface
         ),
         contentPadding = PaddingValues(0.dp)
     ) {
@@ -39,7 +39,7 @@ fun FooterButton(
             imageVector = icon,
             contentDescription = "Footer Button",
             modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.onSecondary
+            tint = MaterialTheme.colorScheme.onSurface
         )
     }
 }

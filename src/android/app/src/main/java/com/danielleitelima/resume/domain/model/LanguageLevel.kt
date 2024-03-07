@@ -1,10 +1,12 @@
 package com.danielleitelima.resume.domain.model
 
-enum class LanguageLevel(val value: Int) {
-    BASIC(1),
-    INTERMEDIATE(2),
-    ADVANCED(3),
-    FLUENT(4),
+import androidx.compose.ui.graphics.Color
+
+enum class LanguageLevel(val value: Int, val color: Color) {
+    BASIC(1, Color(0xFFFDBB30)),
+    INTERMEDIATE(2, Color(0xFFFDBB30)),
+    ADVANCED(3, Color(0xFF32B566)),
+    FLUENT(4, Color(0xFF0296D8)),
     ;
 
     companion object {

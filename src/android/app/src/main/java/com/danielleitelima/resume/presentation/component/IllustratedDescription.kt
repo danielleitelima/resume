@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -24,16 +23,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.danielleitelima.resume.presentation.theme.typographyFamily
 
 @Composable
 fun IllustratedDescription(
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     imageUrl: String? = null,
     description: String,
-    color: Color = MaterialTheme.colorScheme.onPrimary,
-    textStyle: TextStyle = MaterialTheme.typographyFamily.textXs.light,
-    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    textStyle: TextStyle = MaterialTheme.typography.labelLarge,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -45,16 +43,15 @@ fun IllustratedDescription(
                 contentDescription = description,
                 tint = color,
                 modifier = Modifier
-                    .height(20.dp)
-                    .width(20.dp)
+                    .height(18.dp)
+                    .width(18.dp)
             )
         }
         if (imageUrl != null) {
             Box(
                 modifier = Modifier
-                    .height(20.dp)
-                    .width(20.dp)
-                    .padding(2.dp)
+                    .height(18.dp)
+                    .width(18.dp)
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current).build(imageUrl),
@@ -63,7 +60,7 @@ fun IllustratedDescription(
                 )
             }
         }
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(6.dp))
         Text(
             style = textStyle,
             text = description,

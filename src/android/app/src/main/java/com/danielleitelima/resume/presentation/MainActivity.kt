@@ -1,5 +1,6 @@
 package com.danielleitelima.resume.presentation
 
+import ArticleSection
 import CodeSampleSection
 import EducationSection
 import ExperienceSection
@@ -10,7 +11,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,12 +19,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.danielleitelima.resume.domain.model.Article
 import com.danielleitelima.resume.domain.model.CodeSample
 import com.danielleitelima.resume.domain.model.Company
 import com.danielleitelima.resume.domain.model.Education
@@ -36,15 +36,8 @@ import com.danielleitelima.resume.domain.model.Skill
 import com.danielleitelima.resume.presentation.component.Footer
 import com.danielleitelima.resume.presentation.component.Header
 import com.danielleitelima.resume.presentation.component.Introduction
-import com.danielleitelima.resume.presentation.theme.ResumeTheme
+import com.danielleitelima.resume.presentation.theme.AppTheme
 
-// TODO: Organize colors with a custom App theme
-// TODO: Implement base for navigation
-// TODO: Organize code into routes and screens
-// TODO: Add elevation to clickable cards
-// TODO: Fix status bar color
-// TODO: Add launcher icon
-// TODO: Hide see more button if there's no action to it or enough items
 // TODO: Get mocked content from fake repository
 
 class MainActivity : ComponentActivity() {
@@ -52,20 +45,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ResumeTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.primary
-                ) {
-                    Box(modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.primary)
-                    )
-
+            AppTheme {
+                Surface {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                     ) {
-
                         val scrollableState = rememberScrollState()
                         CompositionLocalProvider(
                             LocalOverscrollConfiguration provides null
@@ -96,13 +80,14 @@ class MainActivity : ComponentActivity() {
                                             description = "Lorem ipsum dolor sit amet consectetur. Felis a amet scelerisque semper eu luctus quam in fusce. Mattis vitae amet viverra purus tortor varius eget diam amet. Nullam non magna est viverra non. Quis semper id iaculis enim convallis euismod.",
                                         )
                                     }
-                                    Spacer(modifier = Modifier.height(24.dp))
+                                    Spacer(modifier = Modifier.height(32.dp))
 
                                     val codeSamples = listOf(
                                         CodeSample(
                                             title = "Assisted chatting",
                                             description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, diam quis aliquam faucibus, nisl quam aliquet nunc, quis aliquam nisl nunc eu nisl. Sed euismod, diam quis aliquam faucibus, nisl quam aliquet nunc, quis aliquam nisl nunc eu nisl.",
                                             imageUrl = "https://danielleitelima.github.io/resume/assets/illustration_coding_sample_placeholder.png",
+                                            tag = "Latest"
                                         ),
                                         CodeSample(
                                             title = "Local notifications",
@@ -112,7 +97,7 @@ class MainActivity : ComponentActivity() {
                                     )
 
                                     CodeSampleSection(codeSamples = codeSamples)
-                                    Spacer(modifier = Modifier.height(24.dp))
+                                    Spacer(modifier = Modifier.height(32.dp))
 
                                     Column(
                                         modifier = Modifier
@@ -121,28 +106,28 @@ class MainActivity : ComponentActivity() {
                                         val skills = listOf(
                                             Skill(
                                                 description = "GraphQL",
-                                                "https://danielleitelima.github.io/resume/assets/ic_code.svg"
+                                                "https://danielleitelima.github.io/resume/assets/ic_android.png"
                                             ),
                                             Skill(
                                                 description = "Jetpack Compose",
-                                                "https://danielleitelima.github.io/resume/assets/ic_code.svg"
+                                                "https://danielleitelima.github.io/resume/assets/ic_android.png"
                                             ),
                                             Skill(
                                                 description = "Room DB",
-                                                "https://danielleitelima.github.io/resume/assets/ic_code.svg"
+                                                "https://danielleitelima.github.io/resume/assets/ic_android.png"
                                             ),
                                             Skill(
                                                 description = "Kotlin",
-                                                "https://danielleitelima.github.io/resume/assets/ic_code.svg"
+                                                "https://danielleitelima.github.io/resume/assets/ic_android.png"
                                             ),
                                             Skill(
                                                 description = "KMM",
-                                                "https://danielleitelima.github.io/resume/assets/ic_code.svg"
+                                                "https://danielleitelima.github.io/resume/assets/ic_android.png"
                                             ),
                                         )
 
                                         SkillSection(skills)
-                                        Spacer(modifier = Modifier.height(24.dp))
+                                        Spacer(modifier = Modifier.height(32.dp))
 
                                         val experiences = listOf(
                                             Experience(
@@ -186,7 +171,7 @@ class MainActivity : ComponentActivity() {
                                         )
 
                                         ExperienceSection(experiences = experiences)
-                                        Spacer(modifier = Modifier.height(24.dp))
+                                        Spacer(modifier = Modifier.height(32.dp))
 
                                         val languages = listOf(
                                             Language(
@@ -210,7 +195,7 @@ class MainActivity : ComponentActivity() {
                                         )
 
                                         LanguageSection(languages = languages)
-                                        Spacer(modifier = Modifier.height(24.dp))
+                                        Spacer(modifier = Modifier.height(32.dp))
 
                                         val educationList = listOf(
                                             Education(
@@ -234,11 +219,36 @@ class MainActivity : ComponentActivity() {
                                         )
 
                                         EducationSection(educationList)
-                                        Spacer(modifier = Modifier.height(24.dp))
-                                    }
-                                }
+                                        Spacer(modifier = Modifier.height(32.dp))
 
-                                Spacer(modifier = Modifier.height(30.dp))
+                                    }
+
+                                    val articles = listOf(
+                                        Article(
+                                            title = "Local notifications",
+                                            description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, diam quis aliquam faucibus, nisl quam aliquet nunc, quis aliquam nisl nunc eu nisl. Sed euismod, diam quis aliquam faucibus, nisl quam aliquet nunc, quis aliquam nisl nunc eu nisl.",
+                                            imageUrl = "https://danielleitelima.github.io/resume/assets/illustration_coding_sample_placeholder.png",
+                                            label = "28.05.2023 - 5 min read",
+                                        ),
+                                        Article(
+                                            title = "Local notifications",
+                                            description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, diam quis aliquam faucibus, nisl quam aliquet nunc, quis aliquam nisl nunc eu nisl. Sed euismod, diam quis aliquam faucibus, nisl quam aliquet nunc, quis aliquam nisl nunc eu nisl.",
+                                            imageUrl = "https://danielleitelima.github.io/resume/assets/illustration_coding_sample_placeholder.png",
+                                            label = "28.05.2023 - 5 min read",
+                                        ),
+                                        Article(
+                                            title = "Local notifications",
+                                            description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, diam quis aliquam faucibus, nisl quam aliquet nunc, quis aliquam nisl nunc eu nisl. Sed euismod, diam quis aliquam faucibus, nisl quam aliquet nunc, quis aliquam nisl nunc eu nisl.",
+                                            imageUrl = "https://danielleitelima.github.io/resume/assets/illustration_coding_sample_placeholder.png",
+                                            label = "28.05.2023 - 5 min read",
+                                        ),
+                                    )
+
+                                    ArticleSection(
+                                        articles = articles,
+                                    )
+                                    Spacer(modifier = Modifier.height(32.dp))
+                                }
                                 Footer()
                             }
                         }

@@ -35,7 +35,7 @@ fun ExperienceView(
         TimeLinePoint(isFirst = isFirst)
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            CompanyView(experience.company)
+            CompanyView(company = experience.company)
             experience.roles.forEach {
                 Spacer(modifier = Modifier.height(12.dp))
                 RoleView(role = it)

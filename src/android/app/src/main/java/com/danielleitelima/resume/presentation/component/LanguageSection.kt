@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -13,21 +12,17 @@ import androidx.compose.ui.unit.dp
 import com.danielleitelima.resume.domain.model.Language
 import com.danielleitelima.resume.domain.model.LanguageLevel
 import com.danielleitelima.resume.presentation.component.LanguageItem
-import com.danielleitelima.resume.presentation.component.SeeMoreButton
-import com.danielleitelima.resume.presentation.theme.typographyFamily
 
 @Composable
 fun LanguageSection(
     languages: List<Language>,
     onSeeMore: () -> Unit = {},
 ){
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    Column {
         Text(
             text = "Languages",
-            style = MaterialTheme.typographyFamily.displayXs.medium,
-            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -36,14 +31,6 @@ fun LanguageSection(
             LanguageItem(
                 language = language,
             )
-        }
-        if (languages.size > 1) {
-            Spacer(modifier = Modifier.height(16.dp))
-            SeeMoreButton(
-                modifier = Modifier.align(Alignment.End),
-            ){
-                onSeeMore()
-            }
         }
     }
 }

@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.danielleitelima.resume.domain.model.Role
-import com.danielleitelima.resume.presentation.theme.typographyFamily
 
 @Composable
 fun RoleView(
@@ -20,20 +19,20 @@ fun RoleView(
     Column(modifier = modifier) {
         Text(
             text = role.name,
-            style = MaterialTheme.typographyFamily.textM.semiBold,
-            color = MaterialTheme.colorScheme.onPrimary
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = role.period,
-            style = MaterialTheme.typographyFamily.textXs.regular,
-            color = MaterialTheme.colorScheme.onPrimary
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
-            style = MaterialTheme.typographyFamily.text2xs.regular,
+            style = MaterialTheme.typography.bodySmall,
             text = role.description,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

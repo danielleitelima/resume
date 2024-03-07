@@ -3,14 +3,13 @@ package com.danielleitelima.resume.presentation.component
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.danielleitelima.resume.presentation.theme.typographyFamily
 
 @Composable
 fun Introduction(
@@ -20,18 +19,21 @@ fun Introduction(
 ) {
     Column(modifier = modifier) {
         Text(
-            style = MaterialTheme.typographyFamily.displayXs.regular,
+            style = MaterialTheme.typography.titleLarge,
             text = title,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            style = MaterialTheme.typographyFamily.textS.light,
+            style = MaterialTheme.typography.bodyMedium,
             text = description,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
         )
-        Spacer(modifier = Modifier.height(12.dp))
-        Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f))
+        Spacer(modifier = Modifier.height(32.dp))
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant
+        )
     }
 }
 

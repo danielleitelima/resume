@@ -13,20 +13,17 @@ import com.danielleitelima.resume.domain.model.Company
 import com.danielleitelima.resume.domain.model.Experience
 import com.danielleitelima.resume.domain.model.Role
 import com.danielleitelima.resume.presentation.component.SeeMoreButton
-import com.danielleitelima.resume.presentation.theme.typographyFamily
 
 @Composable
 fun ExperienceSection(
     experiences: List<Experience>,
     onSeeMore: () -> Unit = {},
 ){
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+    Column {
         Text(
             text = "Experience",
-            style = MaterialTheme.typographyFamily.displayXs.medium,
-            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.height(24.dp))
         experiences.forEachIndexed { index, experience ->
@@ -35,7 +32,7 @@ fun ExperienceSection(
                 isFirst = index == 0,
             )
         }
-        if (experiences.size > 1) {
+        if (experiences.size > 10) {
             Spacer(modifier = Modifier.height(16.dp))
             SeeMoreButton(
                 modifier = Modifier.align(Alignment.End),

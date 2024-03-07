@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.danielleitelima.resume.domain.model.Skill
-import com.danielleitelima.resume.presentation.theme.typographyFamily
 
 @Composable
 fun SkillItem(
@@ -19,15 +18,15 @@ fun SkillItem(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(999.dp),
+        shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
     ){
         IllustratedDescription(
             imageUrl = skill.imageUrl,
             description = skill.description,
-            textStyle = MaterialTheme.typographyFamily.textS.light,
+            textStyle = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         )

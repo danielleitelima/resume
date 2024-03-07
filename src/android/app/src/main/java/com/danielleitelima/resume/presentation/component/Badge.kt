@@ -10,23 +10,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.danielleitelima.resume.presentation.theme.typographyFamily
 
 @Composable
 fun Badge(
     modifier: Modifier = Modifier,
-    text: String,
-    color: Color = Color.Black,
-    textColor: Color = Color.White,
+    text: String
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(999.dp),
+        shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = color,
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
     ){
         Box(
@@ -35,8 +31,8 @@ fun Badge(
         ) {
             Text(
                 text = text,
-                color = textColor,
-                style = MaterialTheme.typographyFamily.text2xs.semiBold,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.align(Alignment.Center),
             )
         }

@@ -19,7 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.danielleitelima.resume.domain.model.Language
 import com.danielleitelima.resume.domain.model.LanguageLevel
-import com.danielleitelima.resume.presentation.theme.typographyFamily
 
 @Composable
 fun LanguageItem(
@@ -30,7 +29,7 @@ fun LanguageItem(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondary,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         ),
     ){
         Row(
@@ -41,14 +40,14 @@ fun LanguageItem(
             Column {
                 Text(
                     text = language.name,
-                    style = MaterialTheme.typographyFamily.textS.regular,
-                    color = MaterialTheme.colorScheme.onSecondary,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.padding(4.dp))
                 Text(
                     text = language.description,
-                    style = MaterialTheme.typographyFamily.textXs.light,
-                    color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.8f),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             LanguageLevelIndicator(level = language.level)

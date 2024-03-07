@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import com.danielleitelima.resume.domain.model.Skill
 import com.danielleitelima.resume.presentation.component.SeeMoreButton
 import com.danielleitelima.resume.presentation.component.SkillItem
-import com.danielleitelima.resume.presentation.theme.typographyFamily
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -27,12 +26,11 @@ fun SkillSection(
 ){
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = "Skills",
-            style = MaterialTheme.typographyFamily.displayXs.medium,
-            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.height(24.dp))
         FlowRow(
@@ -47,8 +45,8 @@ fun SkillSection(
                 )
             }
         }
-        if (skills.size > 1) {
-            Spacer(modifier = Modifier.height(8.dp))
+        if (skills.size > 100) {
+            Spacer(modifier = Modifier.height(16.dp))
             SeeMoreButton(
                 modifier = Modifier.align(Alignment.End),
             ){

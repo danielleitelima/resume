@@ -17,15 +17,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.danielleitelima.resume.domain.model.Company
-import com.danielleitelima.resume.presentation.theme.typographyFamily
 
 @Composable
 fun CompanyView(
+    modifier: Modifier = Modifier,
     company: Company,
-    modifier: Modifier = Modifier.fillMaxWidth()
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -35,22 +34,22 @@ fun CompanyView(
             Text(
                 modifier = Modifier.weight(8f),
                 text = company.name,
-                style = MaterialTheme.typographyFamily.textXl.regular,
-                color = MaterialTheme.colorScheme.onPrimary,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
                 modifier = Modifier.weight(2f),
                 text = company.period,
-                style = MaterialTheme.typographyFamily.textXs.light,
+                style = MaterialTheme.typography.labelSmall,
                 textAlign = TextAlign.End,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         IllustratedDescription(
             icon = Icons.Filled.LocationOn,
             description = company.location,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
 }

@@ -24,12 +24,12 @@ fun TimeLinePoint(
         modifier = modifier
             .fillMaxHeight()
             .width(16.dp)
-            .padding(top = if (isFirst) 7.dp else 0.dp)
+            .padding(top = if (isFirst) 4.dp else 0.dp)
     ) {
         val modifierLine = Modifier
             .width(1.dp)
             .fillMaxHeight()
-            .background(MaterialTheme.colorScheme.onPrimary)
+            .background(MaterialTheme.colorScheme.onSurface)
             .align(Alignment.Center)
 
         Box(
@@ -42,7 +42,7 @@ fun TimeLinePoint(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .background(MaterialTheme.colorScheme.onPrimary, CircleShape)
+                    .background(MaterialTheme.colorScheme.onSurface, CircleShape)
             )
         }
         Box(modifierLine)

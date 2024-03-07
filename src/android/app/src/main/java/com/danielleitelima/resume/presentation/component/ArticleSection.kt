@@ -16,13 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.danielleitelima.resume.domain.model.CodeSample
-import com.danielleitelima.resume.presentation.component.CodeSampleItem
+import com.danielleitelima.resume.domain.model.Article
+import com.danielleitelima.resume.presentation.component.ArticleItem
 import com.danielleitelima.resume.presentation.component.SeeMoreButton
 
 @Composable
-fun CodeSampleSection(
-    codeSamples: List<CodeSample>,
+fun ArticleSection(
+    articles: List<Article>,
     onSeeMore: () -> Unit = {},
 ){
     Column(
@@ -35,7 +35,7 @@ fun CodeSampleSection(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Coding style samples",
+                text = "Articles",
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )
@@ -56,17 +56,17 @@ fun CodeSampleSection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Spacer(modifier = Modifier.width(12.dp))
-            codeSamples.forEach { codeSample ->
-                CodeSampleItem(
-                    title = codeSample.title,
-                    description = codeSample.description,
-                    imageUrl = codeSample.imageUrl,
-                    tag = codeSample.tag,
+            articles.forEach { article ->
+                ArticleItem(
+                    title = article.title,
+                    description = article.description,
+                    imageUrl = article.imageUrl,
+                    label = article.label,
                 )
             }
             Spacer(modifier = Modifier.width(12.dp))
         }
-        if (codeSamples.size > 10) {
+        if (articles.size > 10) {
             Spacer(modifier = Modifier.height(24.dp))
             SeeMoreButton(
                 modifier = Modifier.align(Alignment.End).padding(end = 24.dp),
@@ -79,28 +79,28 @@ fun CodeSampleSection(
 
 @Preview
 @Composable
-fun CodeSampleSectionPreview() {
-    val codeSamples = listOf(
-        CodeSample(
+private fun ArticleSectionPreview() {
+    val articles = listOf(
+        Article(
             title = "Kotlin",
             description = "Kotlin is a cross-platform, statically typed, general-purpose programming language with type inference.",
             imageUrl = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
-            tag = "Kotlin",
+            label = "Kotlin",
         ),
-        CodeSample(
+        Article(
             title = "Java",
             description = "Java is a class-based, object-oriented programming language that is designed to have as few implementation dependencies as possible.",
             imageUrl = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
-            tag = "Java",
+            label = "Java",
         ),
-        CodeSample(
+        Article(
             title = "Python",
             description = "Python is an interpreted high-level general-purpose programming language.",
             imageUrl = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
-            tag = "Python",
+            label = "Python",
         ),
     )
-    CodeSampleSection(
-        codeSamples = codeSamples,
+    ArticleSection(
+        articles = articles,
     )
 }

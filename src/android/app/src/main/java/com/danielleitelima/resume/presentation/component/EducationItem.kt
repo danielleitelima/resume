@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.danielleitelima.resume.domain.model.Education
-import com.danielleitelima.resume.presentation.theme.typographyFamily
 
 @Composable
 fun EducationItem(
@@ -28,7 +27,7 @@ fun EducationItem(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondary,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
         ),
     ){
         Column(
@@ -36,26 +35,24 @@ fun EducationItem(
         ) {
             Text(
                 text = education.title,
-                style = MaterialTheme.typographyFamily.textM.medium,
-                color = MaterialTheme.colorScheme.onSecondary
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = education.institution,
-                style = MaterialTheme.typographyFamily.textM.light,
-                color = MaterialTheme.colorScheme.onSecondary
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             IllustratedDescription(
                 icon = Icons.Filled.DateRange,
                 description = education.period,
-                color = MaterialTheme.colorScheme.onSecondary
             )
             Spacer(modifier = Modifier.height(8.dp))
             IllustratedDescription(
                 icon = Icons.Filled.LocationOn,
                 description = education.location,
-                color = MaterialTheme.colorScheme.onSecondary
             )
         }
     }

@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.danielleitelima.resume.presentation.theme.typographyFamily
 
 @Composable
 fun Header(
@@ -27,14 +26,14 @@ fun Header(
     Column {
         Text(
             text = name,
-            style = MaterialTheme.typographyFamily.displayS.medium,
-            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.displaySmall,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = description,
-            style = MaterialTheme.typographyFamily.textXs.light,
-            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.height(12.dp))
         IllustratedDescription(
