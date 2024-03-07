@@ -62,4 +62,10 @@ dependencies {
     implementation(libs.activity.compose)
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
+    implementation(libs.splashscreen)
+    implementation(libs.koin)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.android)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.browser)
 }

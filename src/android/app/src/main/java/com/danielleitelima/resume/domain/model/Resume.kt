@@ -4,7 +4,8 @@ data class Resume(
     val personalData: PersonalData,
     val introduction: Introduction,
     val skills: List<Skill>,
-    val experiences: List<Experience>,
+    val jobExperiences: List<JobExperience>,
     val languages: List<Language>,
-    val education: List<Education>
+    val educationBackground: List<Education>,
+    val articles: List<Article>,
 )
