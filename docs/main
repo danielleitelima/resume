@@ -1,0 +1,250 @@
+{
+  "personalData": {
+    "name": "Daniel Leite Lima",
+    "description": "Mobile software engineer \n Android | KMM | Flutter",
+    "location": "Berlin, Germany",
+    "photoUrl": "https://danielleitelima.github.io/resume/assets/profile_photo.jpg"
+  },
+  "introduction": {
+    "title": "Hi there!",
+    "description": "I am a highly experienced Mobile Software Developer based in Berlin, Germany. My extensive background in the technology sector has allowed me to refine a broad spectrum of skills, particularly in Android, Kotlin Multiplatform Mobile (KMM), and Flutter development. My diverse experiences across healthcare, pharmaceutical logistics, banking, legal services, and public safety sectors have enriched me with a deep understanding of varied market demands and the innovative use of technology to address these needs.\n\nFluency in English and Portuguese, along with fundamental German abilities, empowers me to excel in multicultural settings. Beyond my development capabilities, I excel in crafting sophisticated software architectures, implementing efficient continuous integration and deployment (CI/CD) strategies, and delivering superior user experiences supported by comprehensive automated unit and UI testing.\n\nAs I continue to grow and evolve in this dynamic field, I'm always on the lookout for new challenges and opportunities to contribute my skills towards creating impactful and innovative solutions."
+  },
+  "skills": [
+    {
+      "description": "Android",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_android.svg"
+    },
+    {
+      "description": "Android Jetpack",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_jetpack.svg"
+    },
+    {
+      "description": "Kotlin",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_kotlin.svg"
+    },
+    {
+      "description": "Java",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_java.svg"
+    },
+    {
+      "description": "Koin",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_koin.svg"
+    },
+    {
+      "description": "Gradle",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_gradle.svg"
+    },
+    {
+      "description": "REST",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_rest.svg"
+    },
+    {
+      "description": "GraphQL",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_graphql.svg"
+    },
+    {
+      "description": "Git",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_git.svg"
+    },
+    {
+      "description": "Github",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_github.svg"
+    },
+    {
+      "description": "Figma",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_figma.svg"
+    },
+    {
+      "description": "Jira",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_jira.svg"
+    },
+    {
+      "description": "JUnit",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_junit.svg"
+    },
+    {
+      "description": "Spring",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_spring.svg"
+    },
+    {
+      "description": "SQL",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_sql.svg"
+    },
+    {
+      "description": "Firebase",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_firebase.svg"
+    },
+    {
+      "description": "Sentry",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_sentry.svg"
+    },
+    {
+      "description": "Crashlytics",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_crashlytics.svg"
+    },
+    {
+      "description": "Phrase",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_phrase.svg"
+    },
+    {
+      "description": "Apollo",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_apollo.svg"
+    },
+    {
+      "description": "TypeScript",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_typescript.svg"
+    },
+    {
+      "description": "JavaScript",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_javascript.svg"
+    },
+    {
+      "description": "HTML",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_html.svg"
+    },
+    {
+      "description": "CSS",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_css.svg"
+    },
+    {
+      "description": "AWS",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_aws.svg"
+    },
+    {
+      "description": "Postgres",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_postgres.svg"
+    },
+    {
+      "description": "Linux",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_linux.svg"
+    }
+  ],
+  "experiences": [
+    {
+      "company": {
+        "name": "AppFarms GmbH & Co. KG",
+        "period": "Current",
+        "location": "Berlin, Germany"
+      },
+      "roles": [
+        {
+          "name": "Senior Android Developer",
+          "period": "October 2023 - Now",
+          "description": "Currently contributing to a project for Charité, one of the largest hospitals in Europe, focusing on increasing engagement in a critical women's health study. Utilizing the latest Android technologies including Jetpack Compose, MVI architecture, Material Design 3. Additionally, applying those technologies in a Kotlin Multiplatform project."
+        }
+      ]
+    },
+    {
+      "company": {
+        "name": "MAYD: Meds at your doorstep",
+        "period": "2 years and 4 months",
+        "location": "Berlin, Germany"
+      },
+      "roles": [
+        {
+          "name": "Senior Android Developer",
+          "period": "July 2021 - October 2023",
+          "description": "Played a key role in the architecture design and development of an Android app with a team of 10, using Kotlin, Coroutines, MVVM, Clean Architecture, Jetpack libraries, and Google Maps. Ensured high test coverage with unit and UI tests. Implemented a CI/CD pipeline, streamlined the release process. The app aimed to link pharmacies with customers for quick delivery of medical products and prescription meds, becoming one of the fastest-growing and most used Health related apps in Germany."
+        }
+      ]
+    },
+    {
+      "company": {
+        "name": "BTG Pactual Investment Bank",
+        "period": "9 months",
+        "location": "São Paulo, Brazil"
+      },
+      "roles": [
+        {
+          "name": "Senior Android Developer",
+          "period": "October 2020 - June 2021",
+          "description": "Worked alongside a 15-member Android development team to build the BTG+ bank app, utilizing Kotlin, MVVM, Clean Architecture, Jetpack libraries, and Google Maps. After its launch, played a key role in adding new features and refinements. The app achieved remarkable success, securing the top rating among banking apps on the Play Store and amassing millions of downloads."
+        }
+      ]
+    },
+    {
+      "company": {
+        "name": "Nova Via Tecnologia e Mobilidade",
+        "period": "5 years and 2 months",
+        "location": "Fortaleza, Brazil"
+      },
+      "roles": [
+        {
+          "name": "Senior Android Developer",
+          "period": "November 2018 - October 2020",
+          "description": "Managed multiple front-end and back-end initiatives, guiding a team of 5 developers. Transitioned to Android development in my final year, focusing on clean code practices, architecture, and proficiency in the latest framework technologies. Our applications, utilized daily by thousands across the country, ensured secure and smooth handling of essential legal transactions."
+        },
+        {
+          "name": "Fullstack Developer",
+          "period": "February 2016 - November 2018",
+          "description": "Familiarized myself with the company's tech stack and began working on projects aimed at modernizing legacy systems. Utilized a range of technologies including Android, Java Enterprise, Spring, Hibernate, PostgreSQL, Jasper Reports, AngularJS, CSS, JavaScript, HTML, and Bootstrap."
+        },
+        {
+          "name": "Junior Fullstack Developer",
+          "period": "July 2015 - February 2016",
+          "description": "Honed my technology and problem-solving skills to develop software applications for field police officers, covering various platforms and frameworks. Key technologies included Android, Java Enterprise, Hibernate, PostgreSQL, Java Server Faces, CSS, JavaScript, HTML and Bootstrap."
+        }
+      ]
+    },
+    {
+      "company": {
+        "name": "Department of Public Safety of Ceará",
+        "period": "6 months",
+        "location": "Fortaleza, Brazil"
+      },
+      "roles": [
+        {
+          "name": "Android Developer",
+          "period": "December 2017 - May 2018",
+          "description": "As an independent contractor on a short-term assignment, I focused on a pivotal Google Maps feature for an application utilized by a specialized police unit. This feature was designed to swiftly guide officers to high-risk areas, leveraging an algorithm informed by a prior statistical analysis."
+        }
+      ]
+    },
+    {
+      "company": {
+        "name": "Institute of Research and Economic Strategy of Ceará - IPECE",
+        "period": "4 months",
+        "location": "Fortaleza, Brazil"
+      },
+      "roles": [
+        {
+          "name": "Fullstack Developer",
+          "period": "November 2017 - February 2018",
+          "description": "Served as an independent contractor on a short-term project, where I single-handedly implemented the back-end with Java and Spring, crafted the front-end using Java Server Faces, Bootstrap, JavaScript, CSS, and HTML, and developed the iOS and Android mobile applications using Flutter. The project's objective was to disseminate some of the company's most significant statistical studies to the public."
+        }
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "name": "Portuguese",
+      "level": 4,
+      "description": "Native"
+    },
+    {
+      "name": "English",
+      "level": 4,
+      "description": "Fluent"
+    },
+    {
+      "name": "German",
+      "level": 1,
+      "description": "Basic"
+    }
+  ],
+  "education": [
+    {
+      "title": "Associate in Computer Systems",
+      "institution": "UNESA",
+      "period": "2019 - 2021",
+      "location": "Curitiba, Brazil"
+    },
+    {
+      "title": "Licentiate in Mathematics",
+      "institution": "Universidade Federal do Ceará",
+      "period": "2014 - 2018",
+      "location": "Fortaleza, Brazil"
+    }
+  ],
+  "articles": []
+}
