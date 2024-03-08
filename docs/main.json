@@ -3,7 +3,9 @@
     "name": "Daniel Leite Lima",
     "description": "Mobile software engineer\nAndroid | KMM | Flutter",
     "location": "Berlin, Germany",
-    "photoUrl": "https://danielleitelima.github.io/resume/assets/profile_photo.jpg"
+    "photoUrl": "https://danielleitelima.github.io/resume/assets/profile_photo.jpg",
+    "emailAddress": "limaleite.daniel@gmail.com",
+    "linkedinUrl": "https://www.linkedin.com/in/danielleitelima/"
   },
   "introduction": {
     "title": "Hi there!",
