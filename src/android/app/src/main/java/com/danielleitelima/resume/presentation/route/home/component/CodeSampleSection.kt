@@ -1,3 +1,4 @@
+package com.danielleitelima.resume.presentation.route.home.component
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -14,15 +15,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.danielleitelima.resume.domain.model.CodeSample
-import com.danielleitelima.resume.presentation.route.home.component.CodeSampleItem
-import com.danielleitelima.resume.presentation.route.home.component.SeeMoreButton
+import com.danielleitelima.resume.R
+
+data class CodeSample(
+    val title: String,
+    val description: String,
+    val imageUrl: String,
+    val tag: String? = null,
+    val onClick: () -> Unit = {}
+)
 
 @Composable
 fun CodeSampleSection(
-    codeSamples: List<CodeSample>,
+    codeSamples: List<CodeSample> = emptyList(),
     onSeeMore: () -> Unit = {},
 ){
     Column(
@@ -35,14 +43,14 @@ fun CodeSampleSection(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Coding style samples",
+                text = stringResource(R.string.home_code_sample_section_title),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 style = MaterialTheme.typography.bodyMedium,
-                text = "For those who are interested, you can check my coding style with some samples. ",
+                text = stringResource(R.string.home_code_sample_section_description),
                 color = MaterialTheme.colorScheme.onSurface,
             )
         }
@@ -69,7 +77,9 @@ fun CodeSampleSection(
         if (codeSamples.size > 10) {
             Spacer(modifier = Modifier.height(24.dp))
             SeeMoreButton(
-                modifier = Modifier.align(Alignment.End).padding(end = 24.dp),
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(end = 24.dp),
             ){
                 onSeeMore()
             }

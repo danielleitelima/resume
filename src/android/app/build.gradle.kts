@@ -68,4 +68,7 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.browser)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.scalars)
+    implementation(libs.retrofit.converter.gson)
 }

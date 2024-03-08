@@ -7,6 +7,7 @@ import com.danielleitelima.resume.data.datasource.remote.IntroductionDTO
 import com.danielleitelima.resume.data.datasource.remote.JobExperienceDTO
 import com.danielleitelima.resume.data.datasource.remote.LanguageDTO
 import com.danielleitelima.resume.data.datasource.remote.PersonalDataDTO
+import com.danielleitelima.resume.data.datasource.remote.ResumeAPI
 import com.danielleitelima.resume.data.datasource.remote.ResumeDTO
 import com.danielleitelima.resume.data.datasource.remote.RoleDTO
 import com.danielleitelima.resume.data.datasource.remote.SkillDTO
@@ -23,10 +24,12 @@ import com.danielleitelima.resume.domain.model.Role
 import com.danielleitelima.resume.domain.model.Skill
 import com.danielleitelima.resume.domain.repository.ResumeRepository
 
-class IResumeRepository: ResumeRepository {
+class IResumeRepository(
+    private val resumeAPI: ResumeAPI
+): ResumeRepository {
 
     override suspend fun get(): Resume {
-        TODO()
+        return resumeAPI.getResume().toDomainModel()
     }
 
     private fun ResumeDTO.toDomainModel() = Resume(
@@ -44,6 +47,8 @@ class IResumeRepository: ResumeRepository {
         description = description,
         location = location,
         photoUrl = photoUrl,
+        emailAddress = emailAddress,
+        linkedinUrl = linkedinUrl,
     )
 
     private fun IntroductionDTO.toDomainModel() = Introduction(

@@ -29,16 +29,17 @@ fun CompanyItem(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
         ) {
             Text(
-                modifier = Modifier.weight(8f),
+                modifier = Modifier.weight(15f),
                 text = company.name,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
             )
+            Spacer(modifier = Modifier.weight(1f))
             Text(
-                modifier = Modifier.weight(2f),
+                modifier = Modifier.weight(4f),
                 text = company.period,
                 style = MaterialTheme.typography.labelSmall,
                 textAlign = TextAlign.End,

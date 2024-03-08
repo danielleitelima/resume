@@ -14,7 +14,9 @@ data class PersonalDataDTO(
     val name: String,
     val description: String,
     val location: String,
-    val photoUrl: String
+    val photoUrl: String,
+    val emailAddress: String,
+    val linkedinUrl: String
 )
 
 data class IntroductionDTO(

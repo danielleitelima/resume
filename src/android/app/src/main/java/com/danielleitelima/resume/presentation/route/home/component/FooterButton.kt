@@ -13,16 +13,20 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun FooterButton(
-    icon: ImageVector
+    icon: ImageVector? = null,
+    painter: Painter? = null,
+    onClick: () -> Unit = {}
 ) {
     OutlinedButton(
-        onClick = { /* Do something on click */ },
+        onClick = { onClick() },
         shape = CircleShape,
         modifier = Modifier.size(48.dp),
         colors = ButtonDefaults.buttonColors(
@@ -34,9 +38,10 @@ fun FooterButton(
         ),
         contentPadding = PaddingValues(0.dp)
     ) {
-
         Icon(
-            imageVector = icon,
+            painter = painter ?:
+                if (icon != null) rememberVectorPainter(icon)
+                else return@OutlinedButton,
             contentDescription = "Footer Button",
             modifier = Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.onSurface

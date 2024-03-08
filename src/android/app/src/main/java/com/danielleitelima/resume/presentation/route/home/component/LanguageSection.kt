@@ -16,8 +16,8 @@ import com.danielleitelima.resume.presentation.route.home.component.LanguageItem
 @Composable
 fun LanguageSection(
     languages: List<Language>,
-    onSeeMore: () -> Unit = {},
 ){
+    if (languages.isEmpty()) return
     Column {
         Text(
             text = "Languages",
