@@ -9,7 +9,7 @@
   },
   "introduction": {
     "title": "Hi there!",
-    "description": "I am a highly experienced Mobile Software Developer based in Berlin, Germany. My extensive background in the technology sector has allowed me to refine a broad spectrum of skills, particularly in Android, Kotlin Multiplatform Mobile (KMM), and Flutter development. My diverse experiences across healthcare, pharmaceutical logistics, banking, legal services, and public safety sectors have enriched me with a deep understanding of varied market demands and the innovative use of technology to address these needs.\n\nFluency in English and Portuguese, along with fundamental German abilities, empowers me to excel in multicultural settings. Beyond my development capabilities, I excel in crafting sophisticated software architectures, implementing efficient continuous integration and deployment (CI/CD) strategies, and delivering superior user experiences supported by comprehensive automated unit and UI testing.\n\nAs I continue to grow and evolve in this dynamic field, I'm always on the lookout for new challenges and opportunities to contribute my skills towards creating impactful and innovative solutions."
+    "description": "I am a highly experienced Mobile Software Developer based in Berlin, Germany. My extensive background in the technology sector has allowed me to refine a broad spectrum of skills, particularly in Android, Kotlin Multiplatform Mobile (KMM), and Flutter development. My diverse experiences across healthcare, pharmaceutical logistics, banking, legal services, and public safety sectors have enriched me with a deep understanding of varied market demands and the innovative use of technology to address these needs."
   },
   "skills": [
     {
@@ -242,9 +242,9 @@
       "location": "Curitiba, Brazil"
     },
     {
-      "title": "Licentiate in Mathematics",
+      "title": "Studies in Mathematics",
       "institution": "Universidade Federal do Ceará",
-      "period": "2014 - 2018",
+      "period": "2014 - 2018 (Not completed)",
       "location": "Fortaleza, Brazil"
     }
   ],
