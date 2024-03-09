@@ -1,3 +1,3 @@
-# Content
+## Static remote content
 
-Project files to document its content or provide static data.
+This project server static content to the app clients using GItHub Pages. This is a placeholder solution until a proper backend is implemented.
