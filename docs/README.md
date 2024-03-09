@@ -15,7 +15,7 @@ The original design is [available on Figma](https://www.figma.com/file/NF9oVXWUy
 The implementation is based on the [MVI (Model-View-Intent) pattern](https://proandroiddev.com/mvi-architecture-with-kotlin-flows-and-channels-d36820b2028d) architecture and follows as best as possible the [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) and [SOLID](https://en.wikipedia.org/wiki/SOLID) principles.
 
 ![Layer Dependencies](assets/layer_dependencies.png)
-![Data Flow](assets/layer_dependencies.png)
+![Data Flow](assets/data_flow.png)
 
 ## Frameworks:
 
