@@ -1,4 +1,4 @@
-package com.danielleitelima.resume.data.datasource.remote
+package com.danielleitelima.resume.data.datasource.remote.dto
 
 data class ResumeDTO(
     val personalData: PersonalDataDTO,

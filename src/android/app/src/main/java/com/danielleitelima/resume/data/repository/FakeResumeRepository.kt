@@ -1,4 +1,4 @@
-package com.danielleitelima.resume.data
+package com.danielleitelima.resume.data.repository
 
 import androidx.compose.ui.graphics.Color
 import com.danielleitelima.resume.domain.model.Article

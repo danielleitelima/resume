@@ -1,0 +1,299 @@
+[
+  {
+    "id": "1",
+    "isUserSent": true,
+    "message": "Hallo",
+    "translation": "Hello",
+    "sectionAnalysis": [
+        {
+            "id": "1",
+            "content": "Hallo",
+            "meaning": {
+                "id": "1",
+                "content": "Hello",
+                "examples": [
+                    {
+                        "id": "1",
+                        "content": "Hallo, wie geht es dir?",
+                        "translation": "Hello, how are you?"
+                    }
+                ]
+            },
+            "otherMeanings": [
+                {
+                    "id": "2",
+                    "content": "Hi",
+                    "examples": [
+                        {
+                            "id": "2",
+                            "content": "Hi, wie geht es dir?",
+                            "translation": "Hi, how are you?"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "expressions": [
+        {
+            "id": "1",
+            "content": "Hallo!",
+            "description": "Greeting.",
+            "examples": [
+              {
+                "id": "3",
+                "content": "Hallo, wie geht es dir?",
+                "translation": "Hello, how are you?"
+              }
+            ]
+        }
+    ],
+    "replyOptionIds": [
+        "11"
+    ],
+    "relatedArticles": [
+        {
+            "id": "1",
+            "title": "German greetings and essentials",
+            "description": "GREETINGS, YES AND NO, PLEASE AND THANK YOU — THE BARE MINIMUM YOU NEED TO SURVIVE!",
+            "date": "2020-01-01",
+            "readTime": "5 min",
+            "url": "https://www.thegermanproject.com/german-lessons/greetings-and-essentials"
+        }
+    ]
+  },
+  {
+    "id": "11",
+    "isUserSent": true,
+    "message": "Hi, alles gut?",
+    "translation": "Hi, everything good?",
+    "sectionAnalysis": [
+      {
+        "id": "1",
+        "content": "Hi",
+        "meaning": {
+          "id": "1",
+          "content": "Hello",
+          "examples": [
+            {
+              "id": "1",
+              "content": "Hi, wie geht es dir?",
+              "translation": "Hi, how are you?"
+            }
+          ]
+        },
+        "otherMeanings": []
+      }
+    ],
+    "expressions": [],
+    "replyOptionIds": [],
+    "relatedArticles": [
+      {
+        "id": "1",
+        "title": "German greetings and essentials",
+        "description": "GREETINGS, YES AND NO, PLEASE AND THANK YOU — THE BARE MINIMUM YOU NEED TO SURVIVE!",
+        "date": "2020-01-01",
+        "readTime": "5 min",
+        "url": "https://www.thegermanproject.com/german-lessons/greetings-and-essentials"
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "isUserSent": true,
+    "message": "Hallo",
+    "translation": "Hello",
+    "sectionAnalysis": [
+      {
+        "id": "1",
+        "content": "Hallo",
+        "meaning": {
+          "id": "1",
+          "content": "Hello",
+          "examples": [
+            {
+              "id": "1",
+              "content": "Hallo, wie geht es dir?",
+              "translation": "Hello, how are you?"
+            }
+          ]
+        },
+        "otherMeanings": [
+          {
+            "id": "2",
+            "content": "Hi",
+            "examples": [
+              {
+                "id": "2",
+                "content": "Hi, wie geht es dir?",
+                "translation": "Hi, how are you?"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "expressions": [
+      {
+        "id": "1",
+        "content": "Hallo!",
+        "description": "Greeting.",
+        "examples": [
+          {
+            "id": "3",
+            "content": "Hallo, wie geht es dir?",
+            "translation": "Hello, how are you?"
+          }
+        ]
+      }
+    ],
+    "replyOptionIds": [
+      "11"
+    ],
+    "relatedArticles": [
+      {
+        "id": "1",
+        "title": "German greetings and essentials",
+        "description": "GREETINGS, YES AND NO, PLEASE AND THANK YOU — THE BARE MINIMUM YOU NEED TO SURVIVE!",
+        "date": "2020-01-01",
+        "readTime": "5 min",
+        "url": "https://www.thegermanproject.com/german-lessons/greetings-and-essentials"
+      }
+    ]
+  },
+  {
+    "id": "21",
+    "isUserSent": true,
+    "message": "Hi, alles gut?",
+    "translation": "Hi, everything good?",
+    "sectionAnalysis": [
+      {
+        "id": "1",
+        "content": "Hi",
+        "meaning": {
+          "id": "1",
+          "content": "Hello",
+          "examples": [
+            {
+              "id": "1",
+              "content": "Hi, wie geht es dir?",
+              "translation": "Hi, how are you?"
+            }
+          ]
+        },
+        "otherMeanings": []
+      }
+    ],
+    "expressions": [],
+    "replyOptionIds": [],
+    "relatedArticles": [
+      {
+        "id": "1",
+        "title": "German greetings and essentials",
+        "description": "GREETINGS, YES AND NO, PLEASE AND THANK YOU — THE BARE MINIMUM YOU NEED TO SURVIVE!",
+        "date": "2020-01-01",
+        "readTime": "5 min",
+        "url": "https://www.thegermanproject.com/german-lessons/greetings-and-essentials"
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "isUserSent": true,
+    "message": "Hallo",
+    "translation": "Hello",
+    "sectionAnalysis": [
+      {
+        "id": "1",
+        "content": "Hallo",
+        "meaning": {
+          "id": "1",
+          "content": "Hello",
+          "examples": [
+            {
+              "id": "1",
+              "content": "Hallo, wie geht es dir?",
+              "translation": "Hello, how are you?"
+            }
+          ]
+        },
+        "otherMeanings": [
+          {
+            "id": "2",
+            "content": "Hi",
+            "examples": [
+              {
+                "id": "2",
+                "content": "Hi, wie geht es dir?",
+                "translation": "Hi, how are you?"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "expressions": [
+      {
+        "id": "1",
+        "content": "Hallo!",
+        "description": "Greeting.",
+        "examples": [
+          {
+            "id": "3",
+            "content": "Hallo, wie geht es dir?",
+            "translation": "Hello, how are you?"
+          }
+        ]
+      }
+    ],
+    "replyOptionIds": [
+      "11"
+    ],
+    "relatedArticles": [
+      {
+        "id": "1",
+        "title": "German greetings and essentials",
+        "description": "GREETINGS, YES AND NO, PLEASE AND THANK YOU — THE BARE MINIMUM YOU NEED TO SURVIVE!",
+        "date": "2020-01-01",
+        "readTime": "5 min",
+        "url": "https://www.thegermanproject.com/german-lessons/greetings-and-essentials"
+      }
+    ]
+  },
+  {
+    "id": "31",
+    "isUserSent": true,
+    "message": "Hi, alles gut?",
+    "translation": "Hi, everything good?",
+    "sectionAnalysis": [
+      {
+        "id": "1",
+        "content": "Hi",
+        "meaning": {
+          "id": "1",
+          "content": "Hello",
+          "examples": [
+            {
+              "id": "1",
+              "content": "Hi, wie geht es dir?",
+              "translation": "Hi, how are you?"
+            }
+          ]
+        },
+        "otherMeanings": []
+      }
+    ],
+    "expressions": [],
+    "replyOptionIds": [],
+    "relatedArticles": [
+      {
+        "id": "1",
+        "title": "German greetings and essentials",
+        "description": "GREETINGS, YES AND NO, PLEASE AND THANK YOU — THE BARE MINIMUM YOU NEED TO SURVIVE!",
+        "date": "2020-01-01",
+        "readTime": "5 min",
+        "url": "https://www.thegermanproject.com/german-lessons/greetings-and-essentials"
+      }
+    ]
+  }
+]
