@@ -1,7 +1,7 @@
 package com.danielleitelima.resume.data.foundation
 
-import com.danielleitelima.resume.data.IResumeRepository
-import com.danielleitelima.resume.data.datasource.remote.ResumeAPI
+import com.danielleitelima.resume.data.repository.IResumeRepository
+import com.danielleitelima.resume.data.datasource.remote.api.ResumeAPI
 import com.danielleitelima.resume.domain.repository.ResumeRepository
 import okhttp3.OkHttpClient
 import org.koin.dsl.module

@@ -1,16 +1,16 @@
-package com.danielleitelima.resume.data
+package com.danielleitelima.resume.data.repository
 
-import com.danielleitelima.resume.data.datasource.remote.ArticleDTO
-import com.danielleitelima.resume.data.datasource.remote.CompanyDTO
-import com.danielleitelima.resume.data.datasource.remote.EducationDTO
-import com.danielleitelima.resume.data.datasource.remote.IntroductionDTO
-import com.danielleitelima.resume.data.datasource.remote.JobExperienceDTO
-import com.danielleitelima.resume.data.datasource.remote.LanguageDTO
-import com.danielleitelima.resume.data.datasource.remote.PersonalDataDTO
-import com.danielleitelima.resume.data.datasource.remote.ResumeAPI
-import com.danielleitelima.resume.data.datasource.remote.ResumeDTO
-import com.danielleitelima.resume.data.datasource.remote.RoleDTO
-import com.danielleitelima.resume.data.datasource.remote.SkillDTO
+import com.danielleitelima.resume.data.datasource.remote.dto.AnalysisArticleDTO
+import com.danielleitelima.resume.data.datasource.remote.dto.CompanyDTO
+import com.danielleitelima.resume.data.datasource.remote.dto.EducationDTO
+import com.danielleitelima.resume.data.datasource.remote.dto.IntroductionDTO
+import com.danielleitelima.resume.data.datasource.remote.dto.JobExperienceDTO
+import com.danielleitelima.resume.data.datasource.remote.dto.LanguageDTO
+import com.danielleitelima.resume.data.datasource.remote.dto.PersonalDataDTO
+import com.danielleitelima.resume.data.datasource.remote.api.ResumeAPI
+import com.danielleitelima.resume.data.datasource.remote.dto.ResumeDTO
+import com.danielleitelima.resume.data.datasource.remote.dto.RoleDTO
+import com.danielleitelima.resume.data.datasource.remote.dto.SkillDTO
 import com.danielleitelima.resume.domain.model.Article
 import com.danielleitelima.resume.domain.model.Company
 import com.danielleitelima.resume.domain.model.Education
@@ -91,7 +91,7 @@ class IResumeRepository(
         description = description,
     )
 
-    private fun ArticleDTO.toDomainModel() = Article(
+    private fun AnalysisArticleDTO.toDomainModel() = Article(
         title = title,
         description = description,
         imageUrl = imageUrl,

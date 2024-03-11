@@ -1,0 +1,13 @@
+[
+  {
+    "id": "UUID",
+    "title": "Lili",
+    "initialMessageIds": [
+        "UUID"
+    ],
+    "introduction": {
+      "title": "Hi there!",
+      "description": "I am a highly experienced Mobile Software Developer based in Berlin, Germany. My extensive background in the technology sector has allowed me to refine a broad spectrum of skills, particularly in Android, Kotlin Multiplatform Mobile (KMM), and Flutter development. My diverse experiences across healthcare, pharmaceutical logistics, banking, legal services, and public safety sectors have enriched me with a deep understanding of varied market demands and the innovative use of technology to address these needs."
+    }
+  }
+]
