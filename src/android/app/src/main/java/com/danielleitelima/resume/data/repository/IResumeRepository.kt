@@ -49,6 +49,7 @@ class IResumeRepository(
         photoUrl = photoUrl,
         emailAddress = emailAddress,
         linkedinUrl = linkedinUrl,
+        githubUrl = githubUrl,
     )
 
     private fun IntroductionDTO.toDomainModel() = Introduction(

@@ -30,7 +30,8 @@ import com.danielleitelima.resume.presentation.foundation.mailTo
 fun Footer(
     modifier: Modifier = Modifier,
     emailAddress: String,
-    linkedinUrl: String
+    linkedinUrl: String,
+    githubUrl: String
 ) {
     val context = LocalContext.current
 
@@ -50,7 +51,7 @@ fun Footer(
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -62,10 +63,17 @@ fun Footer(
                     subject = title
                 )
             }
-            Spacer(modifier = Modifier.width(40.dp))
+            Spacer(modifier = Modifier.width(24.dp))
             FooterButton(painter = painterResource(id = R.drawable.ic_linkedin)){
                 context.launchUrl(
                     url = linkedinUrl,
+                    themeColor = themeColor
+                )
+            }
+            Spacer(modifier = Modifier.width(24.dp))
+            FooterButton(painter = painterResource(id = R.drawable.ic_github)){
+                context.launchUrl(
+                    url = githubUrl,
                     themeColor = themeColor
                 )
             }
@@ -78,6 +86,7 @@ fun Footer(
 fun FooterPreview() {
     Footer(
         emailAddress = "limaleite.daniel@gmail.com",
-        linkedinUrl = "https://www.linkedin.com/in/danielleitelima/"
+        linkedinUrl = "https://www.linkedin.com/in/danielleitelima/",
+        githubUrl = "https://github.com/danielleitelima/resume"
     )
 }
