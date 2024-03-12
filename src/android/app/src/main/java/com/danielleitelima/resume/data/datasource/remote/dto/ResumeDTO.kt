@@ -7,7 +7,7 @@ data class ResumeDTO(
     val experiences: List<JobExperienceDTO>,
     val languages: List<LanguageDTO>,
     val education: List<EducationDTO>,
-    val articles: List<ArticleDTO>
+    val articles: List<AnalysisArticleDTO>
 )
 
 data class PersonalDataDTO(
