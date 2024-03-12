@@ -60,7 +60,8 @@ fun HeaderPreview() {
         location = "Berlin, Germany",
         photoUrl = "https://danielleitelima.github.io/resume/assets/profile_photo.jpg",
         emailAddress = "limaleite.daniel@gmail.com",
-        linkedinUrl = "https://www.linkedin.com/in/danielleitelima/"
+        linkedinUrl = "https://www.linkedin.com/in/danielleitelima/",
+        githubUrl = "https://github.com/danielleitelima/resume"
     )
 
     PersonalDataSection(

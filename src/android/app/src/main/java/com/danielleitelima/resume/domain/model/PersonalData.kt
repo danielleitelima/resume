@@ -7,4 +7,5 @@ data class PersonalData(
     val photoUrl: String,
     val emailAddress: String,
     val linkedinUrl: String,
+    val githubUrl: String
 )

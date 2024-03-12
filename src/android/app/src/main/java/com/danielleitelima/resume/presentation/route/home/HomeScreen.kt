@@ -71,7 +71,8 @@ fun HomeScreen(
         }
         Footer(
             emailAddress = resume.personalData.emailAddress,
-            linkedinUrl = resume.personalData.linkedinUrl
+            linkedinUrl = resume.personalData.linkedinUrl,
+            githubUrl = resume.personalData.githubUrl
         )
     }
 }
