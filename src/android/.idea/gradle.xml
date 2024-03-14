@@ -10,6 +10,15 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/feature" />
+            <option value="$PROJECT_DIR$/feature/home" />
+            <option value="$PROJECT_DIR$/feature/home/data" />
+            <option value="$PROJECT_DIR$/feature/home/domain" />
+            <option value="$PROJECT_DIR$/feature/home/presentation" />
+            <option value="$PROJECT_DIR$/foundation" />
+            <option value="$PROJECT_DIR$/foundation/data" />
+            <option value="$PROJECT_DIR$/foundation/domain" />
+            <option value="$PROJECT_DIR$/foundation/presentation" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />
