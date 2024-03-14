@@ -1,10 +1,3 @@
 <resources>
     <string name="app_name">Daniel\'s Resume</string>
-    <string name="home_code_sample_section_title">Coding style samples</string>
-    <string name="home_code_sample_section_description">"For those interested, feel free to explore my coding style through some samples."</string>
-    <string name="home_article_section_title">Articles</string>
-    <string name="home_article_section_description">"Consider exploring some of my publications listed below."</string>
-    <string name="home_footer_title">Let\'s talk!</string>
-    <string name="personal_email_address">limaleite.daniel@gmail.com</string>
-    <string name="personal_linkedin_url">https://www.linkedin.com/in/danielleitelima/</string>
 </resources>

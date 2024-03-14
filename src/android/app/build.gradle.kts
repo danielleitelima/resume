@@ -16,8 +16,8 @@ android {
 //        noinspection OldTargetApi
         targetSdk = 33
 
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -71,4 +71,11 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.scalars)
     implementation(libs.retrofit.converter.gson)
+
+    implementation(project(":foundation:presentation"))
+    implementation(project(":foundation:data"))
+
+    implementation(project(":feature:home:data"))
+    implementation(project(":feature:home:domain"))
+    implementation(project(":feature:home:presentation"))
 }
