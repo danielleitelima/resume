@@ -1,28 +1,17 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    kotlin("kapt")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
-    namespace = "com.danielleitelima.resume"
+    namespace = "com.danielleitelima.resume.chat.presentation"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.danielleitelima.resume"
         minSdk = 28
 
-//        TODO Update targetSdk to 34
-//        noinspection OldTargetApi
-        targetSdk = 33
-
-        versionCode = 2
-        versionName = "1.1"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -35,22 +24,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "1.8"
     }
     buildFeatures {
         compose = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
     }
 }
 
@@ -72,14 +56,7 @@ dependencies {
     implementation(libs.retrofit.converter.scalars)
     implementation(libs.retrofit.converter.gson)
 
-    implementation(project(":foundation:presentation"))
-    implementation(project(":foundation:data"))
-
-    implementation(project(":feature:home:data"))
-    implementation(project(":feature:home:domain"))
-    implementation(project(":feature:home:presentation"))
-
-    implementation(project(":feature:chat:data"))
     implementation(project(":feature:chat:domain"))
-    implementation(project(":feature:chat:presentation"))
+    implementation(project(":foundation:presentation"))
+    implementation(project(":foundation:domain"))
 }

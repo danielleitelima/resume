@@ -1,23 +1,23 @@
-package com.danielleitelima.resume.home.data.datasource.remote.dto
+package com.danielleitelima.resume.chat.data.datasource.remote
 
 data class ChatDTO(
     val id: String,
     val title: String,
-    val initialMessageIds: List<String>,
+    val initialMessageOptionIds: List<String>,
 )
 
 data class MessageDTO(
     val id : String,
     val isUserSent: Boolean,
-    val message: String,
+    val content: String,
     val translation: String,
-    val sectionAnalysis: List<SectionAnalysisDTO>,
+    val sections: List<SectionDTO>,
     val expressions: List<ExpressionDTO>,
     val replyOptionsIds: List<String>,
-    val relatedArticles: List<AnalysisArticleDTO>
+    val relatedArticles: List<RelatedArticleDTO>
 )
 
-data class AnalysisArticleDTO(
+data class RelatedArticleDTO(
     val id: String,
     val title: String,
     val description: String,
@@ -26,7 +26,7 @@ data class AnalysisArticleDTO(
     val url: String
 )
 
-data class SectionAnalysisDTO(
+data class SectionDTO(
     val id: String,
     val content: String,
     val meaning: MeaningDTO,
