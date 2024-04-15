@@ -14,10 +14,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
+import com.danielleitelima.resume.foundation.presentation.foundation.navigation.ChatRoute
 import com.danielleitelima.resume.home.domain.model.Resume
+import com.danielleitelima.resume.home.presentation.route.home.component.CodeSample
+import com.danielleitelima.resume.home.presentation.route.home.component.CodeSampleSection
 import com.danielleitelima.resume.home.presentation.route.home.component.Footer
 import com.danielleitelima.resume.home.presentation.route.home.component.IntroductionSection
 import com.danielleitelima.resume.home.presentation.route.home.component.PersonalDataSection
+
+const val CODE_SAMPLE_PLACEHOLDER_URL = "https://danielleitelima.github.io/resume/assets/illustration_coding_sample_placeholder.png"
 
 @Composable
 fun HomeScreen(
@@ -46,7 +52,24 @@ fun HomeScreen(
             }
             Spacer(modifier = Modifier.height(32.dp))
 
-//            TODO: Add code samples
+            val navController = LocalNavHostController.current
+
+            val codeSamples = listOf(
+                CodeSample(
+                    title = "Assisted chatting",
+                    description = "A method for learning languages through simulated chats.",
+                    imageUrl = CODE_SAMPLE_PLACEHOLDER_URL,
+                    tag = null,
+                    onClick = {
+                        navController.navigate(ChatRoute.Home.name)
+                    }
+                ),
+            )
+
+            CodeSampleSection(
+                codeSamples = codeSamples
+            )
+            Spacer(modifier = Modifier.height(32.dp))
 
             Column(
                 modifier = Modifier

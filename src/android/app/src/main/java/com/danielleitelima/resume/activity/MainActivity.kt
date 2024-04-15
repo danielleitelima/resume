@@ -15,10 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.danielleitelima.resume.foundation.presentation.foundation.BaseRoute
+import com.danielleitelima.resume.chat.presentation.foundation.registerChatRoutes
+import com.danielleitelima.resume.chat.presentation.route.article.list.ArticleListRoute
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
-import com.danielleitelima.resume.foundation.presentation.foundation.register
+import com.danielleitelima.resume.foundation.presentation.foundation.navigation.BaseRoute
 import com.danielleitelima.resume.foundation.presentation.foundation.theme.AppTheme
+import com.danielleitelima.resume.home.presentation.foundation.registerHomeRoutes
 import com.danielleitelima.resume.home.presentation.route.home.HomeRoute
 
 class MainActivity : ComponentActivity() {
@@ -30,7 +32,7 @@ class MainActivity : ComponentActivity() {
 
             MainScreenContent(
                 navController = navController,
-                startDestination = HomeRoute
+                startDestination = ArticleListRoute
             )
         }
     }
@@ -66,7 +68,8 @@ class MainActivity : ComponentActivity() {
                                 navController = navController,
                                 startDestination = startDestination.route,
                             ) {
-                                register(HomeRoute)
+                                registerHomeRoutes()
+                                registerChatRoutes()
                             }
                         }
                     }

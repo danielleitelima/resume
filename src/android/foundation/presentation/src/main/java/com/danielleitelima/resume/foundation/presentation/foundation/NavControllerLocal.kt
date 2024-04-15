@@ -5,6 +5,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
+import com.danielleitelima.resume.foundation.presentation.foundation.navigation.BaseRoute
 
 val LocalNavHostController =
     staticCompositionLocalOf<NavHostController> { throw IllegalStateException("no NavHostController provided") }

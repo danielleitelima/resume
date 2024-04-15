@@ -1,4 +1,4 @@
-package com.danielleitelima.resume.chat.domain.domain
+package com.danielleitelima.resume.chat.domain.usecase
 
 import com.danielleitelima.resume.chat.domain.SentMessage
 import com.danielleitelima.resume.chat.domain.repository.ChatRepository
@@ -14,7 +14,8 @@ class GetSentMessages(
                 SentMessage(
                     id = messageDetail.id,
                     content = messageDetail.content,
-                    timestamp = messageDetail.timestamp
+                    timestamp = messageDetail.timestamp,
+                    isUserSent = messageDetail.isUserSent
                 )
             }
         }

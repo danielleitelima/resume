@@ -1,5 +1,6 @@
 package com.danielleitelima.resume.home.presentation.route.home.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,12 +32,14 @@ fun CodeSampleItem(
     title: String,
     description: String,
     imageUrl: String,
-    tag: String? = null
+    tag: String? = null,
+    onClick: () -> Unit
 ) {
     Card(
         modifier = modifier
             .height(210.dp)
-            .width(160.dp),
+            .width(160.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -100,5 +103,6 @@ fun SampleCardPreview() {
         description = "Calculates the sequence for all supported long numbers.Calculates the sequence for all supported long numbers.Calculates the sequence for all supported long numbers.Calculates the sequence for all supported long numbers.",
         imageUrl = "https://danielleitelima.github.io/resume/assets/ic_code.svg",
         tag = "Badge",
+        onClick = {}
     )
 }

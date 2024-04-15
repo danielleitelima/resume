@@ -1,4 +1,4 @@
-package com.danielleitelima.resume.foundation.presentation.foundation
+package com.danielleitelima.resume.foundation.presentation.foundation.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection.Companion.Left

@@ -55,6 +55,9 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.scalars)
     implementation(libs.retrofit.converter.gson)
+    implementation(libs.extendedspans)
+    implementation(libs.animation.graphics)
+
 
     implementation(project(":feature:chat:domain"))
     implementation(project(":foundation:presentation"))

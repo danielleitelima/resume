@@ -1,4 +1,4 @@
-package com.danielleitelima.resume.home.data
+package com.danielleitelima.resume.home.data.foundation
 
 import com.danielleitelima.resume.home.data.datasource.remote.api.ResumeAPI
 import com.danielleitelima.resume.home.data.repository.IResumeRepository
@@ -8,7 +8,7 @@ import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-val dataDependencyModule = module {
+val homeDataModule = module {
     factory<ResumeRepository> { IResumeRepository(get()) }
 
     single {

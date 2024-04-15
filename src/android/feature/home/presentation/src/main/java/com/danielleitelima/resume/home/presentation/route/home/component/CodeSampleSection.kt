@@ -70,6 +70,7 @@ fun CodeSampleSection(
                     description = codeSample.description,
                     imageUrl = codeSample.imageUrl,
                     tag = codeSample.tag,
+                    onClick = codeSample.onClick,
                 )
             }
             Spacer(modifier = Modifier.width(12.dp))

@@ -10,4 +10,6 @@ interface ChatRepository {
     fun getAll(sync: Boolean = false): Flow<List<Chat>>
 
     suspend fun getMessageById(chatId: String, messageId: String): MessageDetail
+
+    suspend fun selectMessageOption(chatId: String, messageOptionId: String)
 }

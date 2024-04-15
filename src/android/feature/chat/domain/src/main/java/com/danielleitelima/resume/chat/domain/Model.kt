@@ -26,6 +26,7 @@ data class MessageOption(
 data class SentMessage(
     val id: String,
     val content: String,
+    val isUserSent: Boolean,
     val timestamp: Long
 )
 
@@ -39,6 +40,45 @@ data class MessageDetail(
     val expressions: List<Expression>,
     val relatedArticles: List<RelatedArticle>,
     val replyOptionsIds: List<String>,
+){
+    fun getHighlightedRanges(): List<HighlightedRange> {
+        val highlightedRanges = mutableListOf<HighlightedRange>()
+
+        sections.forEach { section ->
+            var currentPosition = 0
+            var count = 0
+
+            while (true) {
+                val start = content.indexOf(section.content, currentPosition)
+                if (start == -1) break
+
+                val end = start + section.content.length
+                currentPosition = end
+
+                if (count == section.position) {
+                    highlightedRanges.add(HighlightedRange(sectionId = section.id, start = start, end = end))
+                    break
+                }
+                count++
+            }
+        }
+
+        return highlightedRanges
+    }
+}
+
+data class Section(
+    val id: String,
+    val position: Int,
+    val content: String,
+    val meaning: Meaning,
+    val otherMeanings: List<Meaning>
+)
+
+data class HighlightedRange(
+    val sectionId: String,
+    val start: Int,
+    val end: Int
 )
 
 data class RelatedArticle(
@@ -47,14 +87,7 @@ data class RelatedArticle(
     val description: String,
     val date: String,
     val readTime: String,
-    val url: String
-)
-
-data class Section(
-    val id: String,
-    val content: String,
-    val meaning: Meaning,
-    val otherMeanings: List<Meaning>
+    val content: String
 )
 
 data class Meaning(

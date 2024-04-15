@@ -1,4 +1,4 @@
-package com.danielleitelima.resume.chat.domain.domain
+package com.danielleitelima.resume.chat.domain.usecase
 
 import com.danielleitelima.resume.chat.domain.MessageDetail
 import com.danielleitelima.resume.chat.domain.repository.ChatRepository
