@@ -35,6 +35,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,18 +57,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavBackStackEntry
-import com.danielleitelima.resume.chat.domain.Example
 import com.danielleitelima.resume.chat.domain.Expression
-import com.danielleitelima.resume.chat.domain.Meaning
-import com.danielleitelima.resume.chat.domain.MessageDetail
 import com.danielleitelima.resume.chat.domain.RelatedArticle
-import com.danielleitelima.resume.chat.domain.Section
 import com.danielleitelima.resume.chat.presentation.R
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
 import com.danielleitelima.resume.foundation.presentation.foundation.Route
 import com.danielleitelima.resume.foundation.presentation.foundation.Screen
 import com.danielleitelima.resume.foundation.presentation.foundation.getKoinInstance
-import com.danielleitelima.resume.foundation.presentation.foundation.navigate
 import com.danielleitelima.resume.foundation.presentation.foundation.rememberViewModel
 import com.danielleitelima.resume.foundation.presentation.foundation.theme.Dimension
 import com.danielleitelima.resume.foundation.presentation.route.chat.ArticleDetail
@@ -77,18 +73,26 @@ import me.saket.extendedspans.ExtendedSpans
 import me.saket.extendedspans.SquigglyUnderlineSpanPainter
 import me.saket.extendedspans.drawBehind
 import me.saket.extendedspans.rememberSquigglyUnderlineAnimator
-import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
+import com.danielleitelima.resume.foundation.presentation.route.chat.MessageDetail as MessageDetailRoute
 
 object MessageDetailScreen : Screen {
     override val route: Route
-        get() = com.danielleitelima.resume.foundation.presentation.route.chat.MessageDetail
+        get() = MessageDetailRoute
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable
     override fun Content(backStackEntry: NavBackStackEntry) {
         val viewModel: MessageDetailViewModel = rememberViewModel { getKoinInstance() }
         val state by viewModel.state.collectAsState()
+
+        val messageId = MessageDetailRoute.getMessageId(backStackEntry)
+
+        LaunchedEffect(messageId) {
+            if (messageId != null){
+                viewModel.setEvent(MessageDetailContract.Event.LoadMessageDetail(messageId))
+            }
+        }
 
         val navController = LocalNavHostController.current
 
@@ -98,114 +102,16 @@ object MessageDetailScreen : Screen {
         )
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-        // TODO: Use actual lists to define the pager states
-        val expressionPagerState = rememberPagerState(pageCount = { 10 })
-        val relatedArticlePagerState = rememberPagerState(pageCount = { 10 })
+        val messageDetail = state.messageDetail
 
-        // TODO: Replace with real data
-        val mockedMessage = "Haha, that sounds like quite an adventure! Animals always bring unexpected moments. 😄"
-        val sections = listOf(
-            Section(
-                id = "1",
-                position = 0,
-                content = "Haha",
-                meaning = Meaning(
-                    id = "1",
-                    content = "Haha",
-                    examples = listOf(),
-                ),
-                otherMeanings = listOf()
-            ),
-            Section(
-                id = "2",
-                position = 0,
-                content = "adventure",
-                meaning = Meaning(
-                    id = "2",
-                    content = "adventure",
-                    examples = listOf(),
-                ),
-                otherMeanings = listOf()
-            ),
-            Section(
-                id = "3",
-                position = 0,
-                content = "Animals",
-                meaning = Meaning(
-                    id = "3",
-                    content = "Animals",
-                    examples = listOf(),
-                ),
-                otherMeanings = listOf()
-            ),
-            Section(
-                id = "4",
-                position = 0,
-                content = "unexpected",
-                meaning = Meaning(
-                    id = "4",
-                    content = "unexpected",
-                    examples = listOf(),
-                ),
-                otherMeanings = listOf()
-            ),
-            Section(
-                id = "5",
-                position = 0,
-                content = "moments",
-                meaning = Meaning(
-                    id = "5",
-                    content = "moments",
-                    examples = listOf(),
-                ),
-                otherMeanings = listOf()
-            )
-        )
+        val expressionPagerState = rememberPagerState(pageCount = { messageDetail?.expressions?.size ?: 0})
+        val relatedArticlePagerState = rememberPagerState(pageCount = { messageDetail?.relatedArticles?.size ?: 0})
 
-        val messageDetail = MessageDetail(
-            id = "1",
-            timestamp = 1713131223418L,
-            isUserSent = true,
-            content = mockedMessage,
-            translation = mockedMessage,
-            sections = sections,
-            expressions = listOf(),
-            relatedArticles = listOf(),
-            replyOptionsIds = listOf()
-        )
-
-        val mockedMessageTranslation = "Haha, isso parece ser uma aventura e tanto! Animais sempre trazem momentos inesperados. 😄"
-
-        val mockedExample1 = Example(
-            id = UUID.randomUUID().toString(),
-            content = "Lorem ipsum dolor sit amet consectetur. Lectus ut erat amet ac euismod. Lectus ut erat amet ac euismod",
-            translation = "Lorem ipsum dolor sit amet consectetur. Lectus ut erat amet ac euismod arcu ultrices leo quis. Lectus ut erat amet ac euismod"
-        )
-
-        val mockedExpression1 = Expression(
-            id = UUID.randomUUID().toString(),
-            content = "Lorem ipsum dolor sit amet consectetur. Lectus ut erat amet ac euismod arcu. Lectus ut erat amet ac euismod",
-            description = "Lorem ipsum dolor sit amet consectetur. Lectus ut erat amet ac euismod arcu. Lectus ut erat amet ac euismod",
-            examples = listOf(
-                mockedExample1,
-                mockedExample1,
-            )
-        )
-
-        val mockedRelatedArticle = RelatedArticle(
-            id = UUID.randomUUID().toString(),
-            title = "Lorem ipsum dolor sit amet consectetur.",
-            description = "Lorem ipsum dolor sit amet consectetur.",
-            date = "2021-09-01",
-            readTime = "5",
-            content = ""
-        )
-
-        val onRelatedArticleClick: () -> Unit = {
-            navController.navigate(ArticleDetail)
+        val onRelatedArticleClick: (String) -> Unit = {
+            navController.navigate(ArticleDetail.routeWithArguments(it))
         }
 
-        val highlightSections = messageDetail.getHighlightedRanges()
+        val highlightSections = messageDetail?.getHighlightedRanges()
 
         Scaffold(
             topBar = {
@@ -244,6 +150,10 @@ object MessageDetailScreen : Screen {
                 )
             },
             content = {
+                if (messageDetail == null) {
+                    return@Scaffold
+                }
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -260,8 +170,8 @@ object MessageDetailScreen : Screen {
                     ) {
                         ExtendedSpansText(
                             text = buildAnnotatedString {
-                                append(mockedMessage)
-                                highlightSections.forEach { highlight ->
+                                append(messageDetail.content)
+                                highlightSections?.forEach { highlight ->
                                     addStyle(
                                         style = SpanStyle(
                                             textDecoration = TextDecoration.Underline,
@@ -277,11 +187,11 @@ object MessageDetailScreen : Screen {
                                 }
                             },
                             onClick = {
-                                val clickedEntry = highlightSections.find { section ->
+                                val clickedEntry = highlightSections?.find { section ->
                                     section.start <= it.toInt() && section.end >= it.toInt()
                                 }
 
-                                val clickedSection = sections.find { section ->
+                                val clickedSection = messageDetail.sections.find { section ->
                                     section.id == clickedEntry?.sectionId
                                 }
 
@@ -292,7 +202,7 @@ object MessageDetailScreen : Screen {
                         )
                         Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
                         Text(
-                            text = mockedMessageTranslation,
+                            text = messageDetail.translation,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center,
@@ -313,9 +223,10 @@ object MessageDetailScreen : Screen {
                     HorizontalPager(state = expressionPagerState,
                         contentPadding = PaddingValues(horizontal = Dimension.Spacing.L.dp),
                         pageSpacing = Dimension.Spacing.S.dp
-                    ) {
+                    ) {position ->
+                        val expression = messageDetail.expressions[position]
                         ExpressionItem(
-                            expression = mockedExpression1,
+                            expression = expression,
                         )
                     }
 
@@ -325,7 +236,11 @@ object MessageDetailScreen : Screen {
                             .align(Alignment.End)
                             .padding(end = Dimension.Spacing.L.dp),
                     ){
-                        navController.navigate(ExpressionList)
+                        navController.navigate(
+                            ExpressionList.routeWithArguments(
+                                messageId = messageId.orEmpty()
+                            )
+                        )
                     }
 
                     Spacer(modifier = Modifier.size(Dimension.Spacing.M.dp))
@@ -339,15 +254,15 @@ object MessageDetailScreen : Screen {
                     )
                     Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
 
-
-
                     HorizontalPager(
                         state = relatedArticlePagerState,
                         contentPadding = PaddingValues(horizontal = Dimension.Spacing.L.dp),
                         pageSpacing = Dimension.Spacing.S.dp,
-                    ) {
+                    ) {position ->
+                        val article = messageDetail.relatedArticles[position]
+
                         RelatedArticleItem(
-                            relatedArticle = mockedRelatedArticle,
+                            relatedArticle = article,
                             onClick = onRelatedArticleClick,
                         )
                     }
@@ -358,13 +273,19 @@ object MessageDetailScreen : Screen {
                             .align(Alignment.End)
                             .padding(end = Dimension.Spacing.L.dp),
                     ){
-                        navController.navigate(ArticleList)
+                        navController.navigate(
+                            ArticleList.routeWithArguments(
+                                messageId = messageId.orEmpty()
+                            )
+                        )
                     }
                 }
             },
         )
 
         if (selectedSection != null) {
+            val section = messageDetail?.sections?.find { it.id == selectedSection }
+
             ModalBottomSheet(
                 onDismissRequest = { selectedSection = null },
                 sheetState = bottomSheetState,
@@ -382,7 +303,7 @@ object MessageDetailScreen : Screen {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Section content",
+                            text = section?.content.orEmpty(),
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -398,18 +319,24 @@ object MessageDetailScreen : Screen {
                     }
                     Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
 
-                    // TODO: Replace with real data
+                    val meaning = section?.meaning
+
                     Text(
-                        text = "Description of the meaning of the section.",
+                        text = meaning?.content.orEmpty(),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
-                    Text(
-                        text = "Example of a phrase using the section.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+
+                    meaning?.examples?.forEach { example ->
+                        Text(
+                            text = example.content,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
+                    }
+
                     Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
                     HorizontalDivider()
                     Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
@@ -420,42 +347,23 @@ object MessageDetailScreen : Screen {
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,
                     )
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
-                    Text(
-                        text = "Description of another meaning for the section.",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
-                    Text(
-                        text = "Example of a phrase using the section.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
-                    Text(
-                        text = "Description of another meaning for the section.",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
-                    Text(
-                        text = "Example of a phrase using the section.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
-                    Text(
-                        text = "Description of another meaning for the section.",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
-                    Text(
-                        text = "Example of a phrase using the section.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+
+                    section?.otherMeanings?.forEach { otherMeaning ->
+                        Text(
+                            text = otherMeaning.content,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
+                        otherMeaning.examples.forEach { example ->
+                            Text(
+                                text = example.content,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
+                        }
+                    }
                     Spacer(modifier = Modifier.height(Dimension.Spacing.XXL.dp))
                 }
             }
@@ -520,7 +428,7 @@ fun ExpressionItem(
 private fun RelatedArticleItem(
     modifier: Modifier = Modifier,
     relatedArticle: RelatedArticle,
-    onClick: () -> Unit = {},
+    onClick: (String) -> Unit = {},
 ) {
     val configuration = LocalConfiguration.current
 
@@ -538,7 +446,7 @@ private fun RelatedArticleItem(
         elevation = CardDefaults.cardElevation(
             defaultElevation = Dimension.Elevation.dp
         ),
-        onClick = onClick,
+        onClick = { onClick(relatedArticle.id) },
     ) {
         Column(
             modifier = Modifier.padding(Dimension.Spacing.M.dp),

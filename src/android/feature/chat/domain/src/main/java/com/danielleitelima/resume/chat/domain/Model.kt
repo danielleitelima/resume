@@ -10,12 +10,13 @@ data class Chat(
 data class AvailableChat(
     val id: String,
     val title: String,
+    val hasHistory: Boolean
 )
 
 data class ActiveChat(
     val id: String,
     val title: String,
-    val lastMessageTimestamp: Long,
+    val lastSentMessage: SentMessage?,
 )
 
 data class MessageOption(

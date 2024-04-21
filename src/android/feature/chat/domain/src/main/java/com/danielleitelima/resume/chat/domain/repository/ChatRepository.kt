@@ -2,6 +2,7 @@ package com.danielleitelima.resume.chat.domain.repository
 
 import com.danielleitelima.resume.chat.domain.Chat
 import com.danielleitelima.resume.chat.domain.MessageDetail
+import com.danielleitelima.resume.chat.domain.RelatedArticle
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
@@ -9,7 +10,9 @@ interface ChatRepository {
 
     fun getAll(sync: Boolean = false): Flow<List<Chat>>
 
-    suspend fun getMessageById(chatId: String, messageId: String): MessageDetail
+    suspend fun getMessageById(messageId: String): MessageDetail
 
     suspend fun selectMessageOption(chatId: String, messageOptionId: String)
+
+    suspend fun getRelatedArticleById(relatedArticleId: String): RelatedArticle
 }

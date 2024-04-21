@@ -2,6 +2,7 @@ package com.danielleitelima.resume.chat.data.repository
 
 import com.danielleitelima.resume.chat.domain.Chat
 import com.danielleitelima.resume.chat.domain.Example
+import com.danielleitelima.resume.chat.domain.Expression
 import com.danielleitelima.resume.chat.domain.Meaning
 import com.danielleitelima.resume.chat.domain.MessageDetail
 import com.danielleitelima.resume.chat.domain.MessageOption
@@ -14,6 +15,33 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class FakeChatRepository : ChatRepository {
+
+    private val mockedPossibleArticles = listOf(
+        RelatedArticle(
+            id = "art1",
+            title = "The usage of 'How are you'",
+            description = "Explains when and how to use the phrase 'How are you' in daily English conversation.",
+            date = "2022-10-10",
+            readTime = "5 mins",
+            content = "The phrase 'How are you' is commonly used as a polite greeting..."
+        ),
+        RelatedArticle(
+            id = "art2",
+            title = "Responses to 'How are you'",
+            description = "This article covers different ways to respond to 'How are you?' in English.",
+            date = "2022-11-01",
+            readTime = "4 mins",
+            content = "Responding to 'How are you?' can vary from simple replies like 'I'm good' to more elaborate..."
+        ),
+        RelatedArticle(
+            id = "art3",
+            title = "Using polite phrases in English",
+            description = "Learn about the importance of polite expressions such as 'thanks for asking' in everyday conversation.",
+            date = "2022-12-15",
+            readTime = "3 mins",
+            content = "Polite phrases like 'thanks for asking' add a level of respect and consideration..."
+        )
+    )
 
     private val mockedPossibleMessages = listOf(
         MessageDetail(
@@ -38,20 +66,52 @@ class FakeChatRepository : ChatRepository {
                             )
                         )
                     ),
-                    otherMeanings = listOf()
+                    otherMeanings = listOf(
+                        Meaning(
+                            id = "mean2",
+                            content = "Como você está indo",
+                            examples = listOf(
+                                Example(
+                                    id = "ex2",
+                                    content = "How are you doing today?",
+                                    translation = "Como você está indo hoje?"
+                                )
+                            )
+                        ),
+                        Meaning(
+                            id = "mean3",
+                            content = "Como você está passando",
+                            examples = listOf(
+                                Example(
+                                    id = "ex3",
+                                    content = "How are you getting along?",
+                                    translation = "Como você está passando?"
+                                )
+                            )
+                        )
+                    )
                 )
             ),
-            expressions = listOf(),
-            relatedArticles = listOf(
-                RelatedArticle(
-                    id = "art1",
-                    title = "The usage of 'How are you'",
-                    description = "Explains when and how to use the phrase 'How are you' in daily English conversation.",
-                    date = "2022-10-10",
-                    readTime = "5 mins",
-                    content = "The phrase 'How are you' is commonly used as a polite greeting..."
+            expressions = listOf(
+                Expression(
+                    id = "exp1",
+                    content = "How are you doing?",
+                    description = "A more casual way to ask 'How are you?'",
+                    examples = listOf(
+                        Example(
+                            id = "ex1",
+                            content = "How are you doing today?",
+                            translation = "Como você está hoje?"
+                        ),
+                        Example(
+                            id = "ex2",
+                            content = "How are you doing this week?",
+                            translation = "Como você está esta semana?"
+                        )
+                    )
                 )
             ),
+            relatedArticles = mockedPossibleArticles,
             replyOptionsIds = listOf("msg2")
         ),
         MessageDetail(
@@ -80,16 +140,7 @@ class FakeChatRepository : ChatRepository {
                 )
             ),
             expressions = listOf(),
-            relatedArticles = listOf(
-                RelatedArticle(
-                    id = "art2",
-                    title = "Responses to 'How are you'",
-                    description = "This article covers different ways to respond to 'How are you?' in English.",
-                    date = "2022-11-01",
-                    readTime = "4 mins",
-                    content = "Responding to 'How are you?' can vary from simple replies like 'I'm good' to more elaborate..."
-                )
-            ),
+            relatedArticles = mockedPossibleArticles,
             replyOptionsIds = listOf("msg3")
         ),
         MessageDetail(
@@ -158,8 +209,12 @@ class FakeChatRepository : ChatRepository {
         return openChats
     }
 
-    override suspend fun getMessageById(chatId: String, messageId: String): MessageDetail {
+    override suspend fun getMessageById(messageId: String): MessageDetail {
         return mockedPossibleMessages.first { it.id == messageId }
+    }
+
+    override suspend fun getRelatedArticleById(relatedArticleId: String): RelatedArticle {
+        return mockedPossibleArticles.first { it.id == relatedArticleId }
     }
 
     override suspend fun selectMessageOption(
@@ -168,7 +223,7 @@ class FakeChatRepository : ChatRepository {
     ){
         val currentlyOpenChats = openChats.first().toMutableList()
 
-        val chat = currentlyOpenChats.first { it.id == chatId }
+        var chat = currentlyOpenChats.first { it.id == chatId }
 
         var latestMessage = mockedPossibleMessages.first { it.id == messageOptionId }
 
@@ -177,15 +232,21 @@ class FakeChatRepository : ChatRepository {
         )
 
         currentlyOpenChats[currentlyOpenChats.indexOf(chat)] = updatedChat
+        chat = currentlyOpenChats.first { it.id == chatId }
 
         while (latestMessage.isUserSent) {
             latestMessage = mockedPossibleMessages.first { it.id == latestMessage.replyOptionsIds.first() }
 
+            val currentHistory = chat.history.toMutableList()
+
+            currentHistory.add(latestMessage)
+
             updatedChat = chat.copy(
-                history = chat.history + latestMessage
+                history = currentHistory
             )
 
             currentlyOpenChats[currentlyOpenChats.indexOf(chat)] = updatedChat
+            chat = currentlyOpenChats.first { it.id == chatId }
         }
 
         val nextMessageId =
@@ -205,6 +266,7 @@ class FakeChatRepository : ChatRepository {
             )
 
             currentlyOpenChats[currentlyOpenChats.indexOf(chat)] = updatedChat
+            chat = currentlyOpenChats.first { it.id == chatId }
         }
 
         openChats.value = currentlyOpenChats

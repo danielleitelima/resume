@@ -13,8 +13,8 @@ class GetMessageOptions(
             if(chat.history.isEmpty()) {
                 chat.initialMessageOptions
             } else {
-                chat.history.last().replyOptionsIds.map { optionId ->
-                    val messageDetail = chatRepository.getMessageById(chatId, optionId)
+                chat.history.last().replyOptionsIds.map { messageOptionId ->
+                    val messageDetail = chatRepository.getMessageById(messageOptionId)
 
                     MessageOption(
                         id = messageDetail.id,

@@ -9,6 +9,7 @@ import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,7 +20,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,23 +29,27 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -60,26 +64,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
+import com.danielleitelima.resume.chat.domain.MessageOption
 import com.danielleitelima.resume.chat.domain.SentMessage
 import com.danielleitelima.resume.chat.presentation.R
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
-import com.danielleitelima.resume.foundation.presentation.foundation.Route
 import com.danielleitelima.resume.foundation.presentation.foundation.Screen
 import com.danielleitelima.resume.foundation.presentation.foundation.copyToClipboard
 import com.danielleitelima.resume.foundation.presentation.foundation.getKoinInstance
-import com.danielleitelima.resume.foundation.presentation.foundation.navigate
 import com.danielleitelima.resume.foundation.presentation.foundation.rememberViewModel
 import com.danielleitelima.resume.foundation.presentation.foundation.theme.Dimension
 import com.danielleitelima.resume.foundation.presentation.route.chat.MessageDetail
 import com.danielleitelima.resume.foundation.presentation.route.chat.MessageList
+import kotlinx.coroutines.launch
 import java.util.Calendar
 
 object MessageListScreen : Screen {
     private const val ANIMATION_DURATION = 300
 
-    override val route: Route
+    override val route: MessageList
         get() = MessageList
-
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationGraphicsApi::class)
     @Composable
@@ -87,64 +90,57 @@ object MessageListScreen : Screen {
         val viewModel: MessageListViewModel = rememberViewModel { getKoinInstance() }
         val state by viewModel.state.collectAsState()
 
+        val chatId = remember { route.getChatId(backStackEntry) }
+
+        LaunchedEffect(chatId) {
+            if (chatId != null){
+                viewModel.setEvent(MessageListContract.Event.LoadMessages(chatId))
+            }
+        }
+
         val navController = LocalNavHostController.current
 
         var openBottomSheet by rememberSaveable { mutableStateOf(false) }
-        var edgeToEdgeEnabled by remember { mutableStateOf(false) }
+
+        var selectedMessageId by remember { mutableStateOf<String?>(null) }
+        var selectedMessageOptionId by remember { mutableStateOf<String?>(null) }
+
         val bottomSheetState = rememberModalBottomSheetState(
-            skipPartiallyExpanded = true
+            skipPartiallyExpanded = true,
+            confirmValueChange = {
+                if(it == SheetValue.Hidden){
+                    selectedMessageOptionId = null
+                    openBottomSheet = false
+                }
+                true
+            }
         )
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-        var selectedMessage by remember { mutableStateOf<String?>(null) }
-
         val context = LocalContext.current
-
-        // TODO: Replace with real messages
-        val mockedSentMessages = listOf(
-            SentMessage("1", "Hey! Long time no see. How have you been?", true, 1713131163418),
-            SentMessage("2", "Hi! I've been doing well. Busy, but good. How about you?", false, 1713131173418),
-            SentMessage("3", "I'm good too, just been caught up with work. What have you been up to?", true, 1713131183418),
-            SentMessage("4", "Mostly working. Just wrapped up a big project. I'm taking some time off now. Any plans for the weekend?", false, 1713131193418),
-            SentMessage("5", "Actually, I'm planning a short trip to the mountains. Ever been to the Rockies?", true, 1713131203418),
-            SentMessage("6", "Yes, I went last year. The view was breathtaking. Make sure to check out the Echo Lake Park if you can.", false, 1713131213418),
-            SentMessage("7", "Sounds great! I'll definitely add that to my list. Have you got any stories from your trip?", true, 1713131223418),
-            SentMessage("8", "Plenty! One funny thing happened when we were hiking. We had just reached a clearing, and suddenly a squirrel decided my backpack was a great place to explore. Spent 20 minutes trying to coax it out with trail mix.", false, 1713131233418)
-        )
-
-        val mockedMessageOptions = listOf(
-            "Haha, that sounds like quite an adventure! Animals always bring unexpected moments. 😄",
-            "Wow, I can't imagine dealing with a squirrel in my backpack! Did you manage to get any photos of that?",
-            "That's hilarious! 😂 It must have been quite a scene. What else did you do on your trip?",
-            "Squirrels can be so cheeky! Thanks for the tip, I'll be sure to keep my snacks sealed up tight.",
-            "Sounds like you made some memorable moments. What’s the best spot you would recommend visiting?"
-        )
 
         Scaffold(
             topBar = {
                 TopAppBar(
                     title = {
-                        // TODO: Replace with real chat name
-                        val mockedChatName = "Lili"
-
-                        val show = selectedMessage == null
+                        val show = selectedMessageId == null
 
                         AnimatedVisibility(
                             visible = show,
                             enter = fadeIn(animationSpec = tween(ANIMATION_DURATION)),
                             exit = fadeOut(animationSpec = tween(ANIMATION_DURATION))
                         ) {
-                            Text(mockedChatName)
+                            Text(state.chat?.title.orEmpty())
                         }
                     },
                     navigationIcon = {
                         val icon = AnimatedImageVector.animatedVectorResource(R.drawable.ic_close_to_arrow_back)
 
-                        val hasSelectedMessage = selectedMessage != null
+                        val hasSelectedMessage = selectedMessageId != null
 
                         IconButton(onClick = {
                             if (hasSelectedMessage) {
-                                selectedMessage = null
+                                selectedMessageId = null
                                 return@IconButton
                             }
                             navController.popBackStack()
@@ -158,12 +154,12 @@ object MessageListScreen : Screen {
                         }
                     },
                     actions = {
-                        val show = selectedMessage != null
+                        val show = selectedMessageId != null
 
                         val scale = animateFloatAsState(if (show) 1f else 0f, label = stringResource(R.string.animation_label_scale))
 
                         IconButton(onClick = {
-                            context.copyToClipboard(selectedMessage.orEmpty(),
+                            context.copyToClipboard(selectedMessageId.orEmpty(),
                                 context.getString(R.string.message_list_alert_content_copy))
                         }) {
                             Icon(
@@ -189,7 +185,7 @@ object MessageListScreen : Screen {
                         }
 
                         IconButton(onClick = {
-                            navController.navigate(MessageDetail)
+                            navController.navigate(MessageDetail.routeWithArguments(selectedMessageId.orEmpty()))
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_translate),
@@ -208,7 +204,7 @@ object MessageListScreen : Screen {
                 )
             },
             content = {
-                if (mockedSentMessages.isEmpty()) {
+                if (state.sentMessages.isEmpty()) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -243,14 +239,14 @@ object MessageListScreen : Screen {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Spacer(modifier = Modifier.size(Dimension.Spacing.M.dp))
-                    mockedSentMessages.forEach { sentMessage ->
-                        val isSelected = selectedMessage == sentMessage.id
+                    state.sentMessages.forEach { sentMessage ->
+                        val isSelected = selectedMessageId == sentMessage.id
 
                         SentMessageItem(
                             sentMessage,
                             isSelected,
-                            onClick = { selectedMessage = null },
-                            onLongPress = { id -> selectedMessage = id }
+                            onClick = { selectedMessageId = null },
+                            onLongPress = { id -> selectedMessageId = id }
                         )
 
                         Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
@@ -295,40 +291,60 @@ object MessageListScreen : Screen {
         )
 
         if (openBottomSheet) {
-            val windowInsets = if (edgeToEdgeEnabled)
-                WindowInsets(0) else BottomSheetDefaults.windowInsets
-
             ModalBottomSheet(
-                onDismissRequest = { openBottomSheet = false },
+                onDismissRequest = {
+                    openBottomSheet = false
+                    selectedMessageOptionId = ""
+                },
                 sheetState = bottomSheetState,
-                windowInsets = windowInsets,
                 containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
             ) {
                 Column(
                     modifier = Modifier.padding(horizontal = Dimension.Spacing.L.dp),
                     horizontalAlignment = Alignment.End
                 ) {
-                    mockedMessageOptions.forEach {
-                        MessageOptionItem(it)
+                    state.messageOptions.forEach {
+                        MessageOptionItem(
+                            messageOption = it,
+                            isSelected = selectedMessageOptionId == it.id,
+                        ){
+                            selectedMessageOptionId = if (selectedMessageOptionId == it.id) "" else it.id
+                        }
+
                         Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
                     }
                     Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
+
+                    val coroutineScope = rememberCoroutineScope()
+
                     Button(
-                        onClick = { openBottomSheet = false },
+                        enabled = selectedMessageOptionId.orEmpty().isNotEmpty(),
+                        onClick = {
+                            viewModel.setEvent(
+                                MessageListContract.Event.SelectMessageOption(
+                                    selectedMessageOptionId.orEmpty()
+                                )
+                            )
+
+                            coroutineScope.launch {
+                                openBottomSheet = false
+                                selectedMessageOptionId = ""
+                            }
+                        },
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_send),
                             contentDescription = stringResource(R.string.content_description_send),
-                            modifier = Modifier.size(Dimension.Icon.dp),
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            modifier = Modifier
+                                .size(Dimension.Icon.dp),
                         )
                         Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
                         Text(
                             text = stringResource(R.string.message_list_button_send),
                             style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
+
                     Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
                 }
             }
@@ -337,16 +353,27 @@ object MessageListScreen : Screen {
 }
 
 @Composable
-fun MessageOptionItem(content: String) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(Dimension.CornerRadius.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainer),
+fun MessageOptionItem(
+    messageOption: MessageOption,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val border = if (isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(Dimension.CornerRadius.dp),
+        border = border,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        ),
+        onClick = onClick,
     ) {
         Text(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = Dimension.Spacing.M.dp, vertical = Dimension.Spacing.S.dp),
-            text = content,
+            text = messageOption.content,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface
         )

@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -40,7 +41,6 @@ import com.danielleitelima.resume.foundation.presentation.foundation.getKoinInst
 import com.danielleitelima.resume.foundation.presentation.foundation.rememberViewModel
 import com.danielleitelima.resume.foundation.presentation.foundation.theme.Dimension
 import com.danielleitelima.resume.foundation.presentation.route.chat.ExpressionList
-import java.util.UUID
 
 object ExpressionListScreen : Screen {
     override val route: Route
@@ -52,25 +52,16 @@ object ExpressionListScreen : Screen {
         val viewModel: ExpressionListViewModel = rememberViewModel { getKoinInstance() }
         val state by viewModel.state.collectAsState()
 
+        val messageId = ExpressionList.getMessageId(backStackEntry)
+
+        LaunchedEffect(messageId) {
+            if (messageId != null){
+                viewModel.setEvent(ExpressionListContract.Event.LoadExpressions(messageId))
+            }
+        }
+
         val navController = LocalNavHostController.current
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-        // TODO: Replace mocked data with real data
-        val mockedExample1 = Example(
-            id = UUID.randomUUID().toString(),
-            content = "Lorem ipsum dolor sit amet consectetur. Lectus ut erat amet ac euismod. Lectus ut erat amet ac euismod",
-            translation = "Lorem ipsum dolor sit amet consectetur. Lectus ut erat amet ac euismod arcu ultrices leo quis. Lectus ut erat amet ac euismod"
-        )
-
-        val mockedExpression1 = Expression(
-            id = UUID.randomUUID().toString(),
-            content = "Lorem ipsum dolor sit amet consectetur. Lectus ut erat amet ac euismod arcu. Lectus ut erat amet ac euismod",
-            description = "Lorem ipsum dolor sit amet consectetur. Lectus ut erat amet ac euismod arcu. Lectus ut erat amet ac euismod",
-            examples = listOf(
-                mockedExample1,
-                mockedExample1,
-            )
-        )
 
         Scaffold(
             topBar = {
@@ -107,9 +98,9 @@ object ExpressionListScreen : Screen {
                 ) {
                     Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
 
-                    for (i in 0..10) {
+                    state.expressions.forEach { expression ->
                         ExpressionItem(
-                            expression = mockedExpression1,
+                            expression = expression,
                         )
                         Spacer(modifier = Modifier.height(Dimension.Spacing.S.dp))
                     }

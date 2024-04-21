@@ -10,12 +10,12 @@ class GetAvailableChat(
 ) {
     operator fun invoke(): Flow<List<AvailableChat>> {
         return chatRepository.getAll(sync = true).map { chats ->
-            chats.mapNotNull { chat ->
-                if (chat.history.isEmpty()) AvailableChat(
+            chats.map { chat ->
+                AvailableChat(
                     id = chat.id,
                     title = chat.title,
+                    hasHistory = chat.history.isNotEmpty()
                 )
-                else null
             }
         }
     }

@@ -19,7 +19,6 @@ import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHos
 import com.danielleitelima.resume.foundation.presentation.foundation.Screen
 import com.danielleitelima.resume.foundation.presentation.foundation.theme.AppTheme
 import com.danielleitelima.resume.home.presentation.foundation.registerHomeRoutes
-import com.danielleitelima.resume.home.presentation.screen.home.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +29,7 @@ class MainActivity : ComponentActivity() {
 
             MainScreenContent(
                 navController = navController,
-                startDestination = HomeScreen
+                startDestination = com.danielleitelima.resume.chat.presentation.screen.home.HomeScreen
             )
         }
     }

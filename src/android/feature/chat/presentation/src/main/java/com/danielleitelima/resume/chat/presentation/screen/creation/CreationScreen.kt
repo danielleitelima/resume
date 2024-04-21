@@ -35,7 +35,6 @@ import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHos
 import com.danielleitelima.resume.foundation.presentation.foundation.Route
 import com.danielleitelima.resume.foundation.presentation.foundation.Screen
 import com.danielleitelima.resume.foundation.presentation.foundation.getKoinInstance
-import com.danielleitelima.resume.foundation.presentation.foundation.navigate
 import com.danielleitelima.resume.foundation.presentation.foundation.rememberViewModel
 import com.danielleitelima.resume.foundation.presentation.foundation.stealthClickable
 import com.danielleitelima.resume.foundation.presentation.foundation.theme.Dimension
@@ -91,7 +90,7 @@ object CreationScreen : Screen {
                 ) {
                     availableChats.forEach { availableChat ->
                         CreationItem(availableChat.title){
-                            navController.navigate(MessageList)
+                            navController.navigate(MessageList.routeWithArguments(availableChat.id))
                         }
                     }
                 }

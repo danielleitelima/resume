@@ -5,5 +5,5 @@ import com.danielleitelima.resume.chat.domain.repository.ChatRepository
 import org.koin.dsl.module
 
 val chatDataModule = module {
-    factory<ChatRepository> { FakeChatRepository() }
+    single<ChatRepository> { FakeChatRepository() }
 }

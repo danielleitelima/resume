@@ -36,11 +36,11 @@ fun NavGraphBuilder.registerChatRoutes() {
 }
 
 val chatPresentationModule = module {
-    factory<ArticleDetailViewModel> { IArticleDetailViewModel() }
-    factory<ArticleListViewModel> { IArticleListViewModel() }
+    factory<ArticleDetailViewModel> { IArticleDetailViewModel(get()) }
+    factory<ArticleListViewModel> { IArticleListViewModel(get()) }
     factory<CreationViewModel> { ICreationViewModel(get()) }
-    factory<ExpressionListViewModel> { IExpressionListViewModel() }
+    factory<ExpressionListViewModel> { IExpressionListViewModel(get()) }
     factory<HomeViewModel> { IHomeViewModel(get()) }
-    factory<MessageDetailViewModel> { IMessageDetailViewModel() }
-    factory<MessageListViewModel> { IMessageListViewModel() }
+    factory<MessageDetailViewModel> { IMessageDetailViewModel(get()) }
+    factory<MessageListViewModel> { IMessageListViewModel(get(), get(), get(), get()) }
 }

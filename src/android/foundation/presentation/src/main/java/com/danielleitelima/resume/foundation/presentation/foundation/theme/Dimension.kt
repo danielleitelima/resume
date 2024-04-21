@@ -12,7 +12,7 @@ sealed class Dimension(
     sealed class Spacing(
         value: Int,
     ) : Dimension(value) {
-        data object XXS : Spacing(8)
+        data object XXS : Spacing(4)
         data object XS : Spacing(8)
         data object S : Spacing(12)
         data object M : Spacing(16)

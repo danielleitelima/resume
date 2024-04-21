@@ -16,25 +16,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavBackStackEntry
-import com.danielleitelima.resume.chat.domain.RelatedArticle
 import com.danielleitelima.resume.chat.presentation.R
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
-import com.danielleitelima.resume.foundation.presentation.foundation.Route
 import com.danielleitelima.resume.foundation.presentation.foundation.Screen
 import com.danielleitelima.resume.foundation.presentation.foundation.getKoinInstance
 import com.danielleitelima.resume.foundation.presentation.foundation.rememberViewModel
 import com.danielleitelima.resume.foundation.presentation.foundation.theme.Dimension
 import com.danielleitelima.resume.foundation.presentation.route.chat.ArticleDetail
-import java.util.UUID
 
 object ArticleDetailScreen : Screen {
-    override val route: Route
+    override val route: ArticleDetail
         get() = ArticleDetail
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -43,17 +42,18 @@ object ArticleDetailScreen : Screen {
         val viewModel: ArticleDetailViewModel = rememberViewModel { getKoinInstance() }
         val state by viewModel.state.collectAsState()
 
+        val article = state.article
+
         val navController = LocalNavHostController.current
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-        val mockedRelatedArticle = RelatedArticle(
-            id = UUID.randomUUID().toString(),
-            title = "Lorem ipsum dolor sit amet consectetur Tincidunt.",
-            description = "Lorem ipsum dolor sit amet consectetur. Sit blandit lectus etiam mattis. Curabitur imperdiet et egestas nulla. Eget scelerisque est etiam facilisi ultrices quis enim. Eget varius eget viverra tristique.",
-            date = "2021-09-01",
-            readTime = "5",
-            content = "Lorem ipsum dolor sit amet consectetur. Quam elementum malesuada quis quis. A vel non vitae mattis. Nullam id turpis elit pellentesque accumsan id eget etiam. Dictum nunc diam feugiat massa habitasse adipiscing. Enim viverra mauris semper ridiculus pellentesque ac nisi. Volutpat augue condimentum congue lorem. Venenatis ut varius ornare sit lacus eu varius feugiat molestie. In vitae in amet malesuada sagittis. Sociis at arcu mattis metus ultrices. Convallis convallis quis diam dui amet. Sed velit nisi tellus nec. Facilisis ullamcorper eget vitae tellus. Consectetur diam sit in in ac egestas mi lectus. Ipsum elit maecenas aliquet gravida. Enim vestibulum integer faucibus risus eget laoreet amet tincidunt pulvinar. In vitae fringilla nisl fermentum nibh urna et. Convallis proin nec orci nec nascetur commodo et quisque ullamcorper. Varius quam neque velit sed eros posuere a. Vitae varius lectus nullam viverra mauris ullamcorper quis massa penatibus. Vitae tempus justo id dolor ac malesuada facilisis sed sit. Vestibulum sollicitudin nunc mi scelerisque id sit enim diam. Aliquet malesuada leo tellus tincidunt donec. Arcu pharetra ut quis in ultrices turpis eu lorem leo. Neque iaculis turpis tempor nisl laoreet lacus pharetra sapien id. Etiam maecenas sit penatibus placerat lacus eget. Quis semper lectus a posuere urna aliquet posuere viverra. Tempus orci velit urna ipsum vitae. Vulputate cursus vitae felis libero non. Fames viverra faucibus turpis sit habitant curabitur aenean."
-        )
+        val articleId = remember { route.getArticleId(backStackEntry) }
+
+        LaunchedEffect(articleId) {
+            if (articleId != null){
+                viewModel.setEvent(ArticleDetailContract.Event.LoadArticle(articleId))
+            }
+        }
 
         Scaffold(
             topBar = {
@@ -78,6 +78,8 @@ object ArticleDetailScreen : Screen {
                 )
             },
             content = {
+                if(article == null) return@Scaffold
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -87,7 +89,7 @@ object ArticleDetailScreen : Screen {
                 ) {
                     Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
                     Text(
-                        text = mockedRelatedArticle.title,
+                        text = article.title,
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -95,21 +97,21 @@ object ArticleDetailScreen : Screen {
                     Text(
                         text = stringResource(
                             R.string.message_detail_read_time,
-                            mockedRelatedArticle.date,
-                            mockedRelatedArticle.readTime
+                            article.date,
+                            article.readTime
                         ),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
                     Text(
-                        text = mockedRelatedArticle.description,
+                        text = article.description,
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
                     Text(
-                        text = mockedRelatedArticle.content,
+                        text = article.content,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                     )

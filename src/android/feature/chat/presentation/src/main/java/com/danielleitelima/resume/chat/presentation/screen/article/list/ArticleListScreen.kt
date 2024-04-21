@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -39,12 +40,11 @@ import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHos
 import com.danielleitelima.resume.foundation.presentation.foundation.Route
 import com.danielleitelima.resume.foundation.presentation.foundation.Screen
 import com.danielleitelima.resume.foundation.presentation.foundation.getKoinInstance
-import com.danielleitelima.resume.foundation.presentation.foundation.navigate
 import com.danielleitelima.resume.foundation.presentation.foundation.rememberViewModel
 import com.danielleitelima.resume.foundation.presentation.foundation.theme.Dimension
 import com.danielleitelima.resume.foundation.presentation.route.chat.ArticleDetail
 import com.danielleitelima.resume.foundation.presentation.route.chat.ArticleList
-import java.util.UUID
+import com.danielleitelima.resume.foundation.presentation.route.chat.ExpressionList
 
 object ArticleListScreen : Screen {
     override val route: Route
@@ -56,18 +56,16 @@ object ArticleListScreen : Screen {
         val viewModel: ArticleListViewModel = rememberViewModel { getKoinInstance() }
         val state by viewModel.state.collectAsState()
 
+        val messageId = ExpressionList.getMessageId(backStackEntry)
+
+        LaunchedEffect(messageId) {
+            if (messageId != null){
+                viewModel.setEvent(ArticleListContract.Event.LoadArticles(messageId))
+            }
+        }
+
         val navController = LocalNavHostController.current
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-        // TODO: Replace mocked data with real data
-        val mockedRelatedArticle = RelatedArticle(
-            id = UUID.randomUUID().toString(),
-            title = "Lorem ipsum dolor sit amet consectetur Tincidunt.",
-            description = "Lorem ipsum dolor sit amet consectetur. Sit blandit lectus etiam mattis. Curabitur imperdiet et egestas nulla. Eget scelerisque est etiam facilisi ultrices quis enim. Eget varius eget viverra tristique.",
-            date = "2021-09-01",
-            readTime = "5",
-            content = ""
-        )
 
         Scaffold(
             topBar = {
@@ -104,11 +102,11 @@ object ArticleListScreen : Screen {
                 ) {
                     Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
 
-                    for (i in 0..10) {
+                    state.relatedArticles.forEach { relatedArticle ->
                         RelatedArticleItem(
-                            relatedArticle = mockedRelatedArticle
+                            relatedArticle = relatedArticle
                         ){
-                            navController.navigate(ArticleDetail)
+                            navController.navigate(ArticleDetail.routeWithArguments(relatedArticle.id))
                         }
                         Spacer(modifier = Modifier.height(Dimension.Spacing.S.dp))
                     }
