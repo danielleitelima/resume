@@ -1,8 +1,12 @@
 package com.danielleitelima.resume.foundation.presentation.foundation
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.widget.Toast
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import kotlinx.coroutines.CoroutineScope
@@ -57,5 +61,19 @@ fun Context.launchUrl(url: String, themeColor: Int? = null) {
                 intent.launchUrl(this@launchUrl, Uri.parse(url))
             }
         } catch (e: IOException) { }
+    }
+}
+
+
+fun Context?.copyToClipboard(text: String, message: String = "") {
+    this ?: return
+    val clipboardManager = this.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+    val clipData = ClipData.newPlainText("text", text)
+    clipboardManager?.setPrimaryClip(clipData)
+
+    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+        Toast
+            .makeText(this, message, Toast.LENGTH_SHORT)
+            .show()
     }
 }

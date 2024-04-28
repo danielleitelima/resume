@@ -78,4 +78,8 @@ dependencies {
     implementation(project(":feature:home:data"))
     implementation(project(":feature:home:domain"))
     implementation(project(":feature:home:presentation"))
+
+    implementation(project(":feature:chat:data"))
+    implementation(project(":feature:chat:domain"))
+    implementation(project(":feature:chat:presentation"))
 }

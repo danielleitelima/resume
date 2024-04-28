@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_name">Assisted chatting</string>
+    <string name="content_description_info">Info</string>
+    <string name="content_description_back">Back</string>
+    <string name="content_description_chatting">Chatting Illustration</string>
+    <string name="home_title">Start your adventure</string>
+    <string name="home_description">Step into your first chat and discover, learn, and grow as every message unfolds a new path in your language learning journey. Ready for the challenge?</string>
+    <string name="content_description_create_chat">Create chat</string>
+    <string name="home_overlay_content">This sample demonstrates a game-based approach to language learning, facilitated by a straightforward user interface and AI-generated content. Users can initiate a conversation with a selection of Bot characters and advance the interaction by choosing from an array of pre-defined message options. Should a message or its response from the Bot seem unclear, there\'s an option to analyse it, for a comprehensive breakdown of its meaning. Additionally, users have the flexibility to delete entire chat histories to restart the assisted conversations or simply return to point of a specific message.</string>
+    <string name="creation_title">New message</string>
+    <string name="content_description_back_or_close">Back or Close</string>
+    <string name="message_list_alert_content_copy">Message copied</string>
+    <string name="content_description_copy">Copy</string>
+    <string name="content_description_undo">Undo</string>
+    <string name="content_description_translate">Message detail</string>
+    <string name="animation_label_scale">Scale</string>
+    <string name="content_description_coiled_arrow">Arrow pointing down</string>
+    <string name="message_list_empty_description">Select your first message</string>
+    <string name="content_description_send">Send</string>
+    <string name="message_list_label_option">View message options</string>
+    <string name="message_list_button_send">Send</string>
+    <string name="message_detail_title">Analysis</string>
+    <string name="content_description_volume_up">Text to speech</string>
+    <string name="message_detail_section_expression_label">Common expressions</string>
+    <string name="message_detail_section_article_label">Related articles</string>
+    <string name="message_detail_section_label_other_meaning">Other meanings</string>
+    <string name="message_detail_read_time">%1$s • %2$s min read</string>
+    <string name="message_detail_button_see_more">See more</string>
+    <string name="expression_list_title">Common expressions</string>
+    <string name="article_list_title">Related articles</string>
+</resources>

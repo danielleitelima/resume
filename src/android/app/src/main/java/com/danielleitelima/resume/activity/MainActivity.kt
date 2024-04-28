@@ -10,27 +10,31 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.danielleitelima.resume.foundation.presentation.foundation.BaseRoute
+import com.danielleitelima.resume.chat.presentation.foundation.registerChatRoutes
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
-import com.danielleitelima.resume.foundation.presentation.foundation.register
+import com.danielleitelima.resume.foundation.presentation.foundation.Screen
+import com.danielleitelima.resume.foundation.presentation.foundation.TextToSpeechManager
+import com.danielleitelima.resume.foundation.presentation.foundation.getKoinInstance
 import com.danielleitelima.resume.foundation.presentation.foundation.theme.AppTheme
-import com.danielleitelima.resume.home.presentation.route.home.HomeRoute
+import com.danielleitelima.resume.home.presentation.foundation.registerHomeRoutes
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val textToSpeechManager: TextToSpeechManager = getKoinInstance()
+        textToSpeechManager.init(this)
 
         setContent {
             val navController = rememberNavController()
 
             MainScreenContent(
                 navController = navController,
-                startDestination = HomeRoute
+                startDestination = com.danielleitelima.resume.chat.presentation.screen.home.HomeScreen
             )
         }
     }
@@ -39,20 +43,8 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun MainScreenContent(
         navController: NavHostController,
-        startDestination: BaseRoute,
-        destinationRoute: BaseRoute = startDestination,
+        startDestination: Screen,
     ) {
-        LaunchedEffect(startDestination.route) {
-            if (destinationRoute.route == navController.currentDestination?.route) return@LaunchedEffect
-            navController.navigate(destinationRoute.route) {
-                if (startDestination == HomeRoute) {
-                    popUpTo(navController.graph.id) {
-                        inclusive = true
-                    }
-                }
-            }
-        }
-
         AppTheme {
             Surface {
                 Box(
@@ -64,9 +56,10 @@ class MainActivity : ComponentActivity() {
                         ) {
                             NavHost(
                                 navController = navController,
-                                startDestination = startDestination.route,
+                                startDestination = startDestination.route.uri,
                             ) {
-                                register(HomeRoute)
+                                registerHomeRoutes()
+                                registerChatRoutes()
                             }
                         }
                     }
