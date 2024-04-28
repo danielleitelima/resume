@@ -17,12 +17,17 @@ import androidx.navigation.compose.rememberNavController
 import com.danielleitelima.resume.chat.presentation.foundation.registerChatRoutes
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
 import com.danielleitelima.resume.foundation.presentation.foundation.Screen
+import com.danielleitelima.resume.foundation.presentation.foundation.TextToSpeechManager
+import com.danielleitelima.resume.foundation.presentation.foundation.getKoinInstance
 import com.danielleitelima.resume.foundation.presentation.foundation.theme.AppTheme
 import com.danielleitelima.resume.home.presentation.foundation.registerHomeRoutes
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val textToSpeechManager: TextToSpeechManager = getKoinInstance()
+        textToSpeechManager.init(this)
 
         setContent {
             val navController = rememberNavController()

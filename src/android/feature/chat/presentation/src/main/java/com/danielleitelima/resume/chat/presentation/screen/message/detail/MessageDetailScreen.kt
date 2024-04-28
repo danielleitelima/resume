@@ -63,6 +63,7 @@ import com.danielleitelima.resume.chat.presentation.R
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
 import com.danielleitelima.resume.foundation.presentation.foundation.Route
 import com.danielleitelima.resume.foundation.presentation.foundation.Screen
+import com.danielleitelima.resume.foundation.presentation.foundation.TextToSpeechManager
 import com.danielleitelima.resume.foundation.presentation.foundation.getKoinInstance
 import com.danielleitelima.resume.foundation.presentation.foundation.rememberViewModel
 import com.danielleitelima.resume.foundation.presentation.foundation.theme.Dimension
@@ -85,8 +86,9 @@ object MessageDetailScreen : Screen {
     override fun Content(backStackEntry: NavBackStackEntry) {
         val viewModel: MessageDetailViewModel = rememberViewModel { getKoinInstance() }
         val state by viewModel.state.collectAsState()
-
         val messageId = MessageDetailRoute.getMessageId(backStackEntry)
+
+        val textToSpeechManager: TextToSpeechManager = remember { getKoinInstance() }
 
         LaunchedEffect(messageId) {
             if (messageId != null){
@@ -113,6 +115,9 @@ object MessageDetailScreen : Screen {
 
         val highlightSections = messageDetail?.getHighlightedRanges()
 
+        val isMessagePlaying = remember { mutableStateOf(false) }
+        val isSectionPlaying = remember { mutableStateOf(false) }
+
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -121,10 +126,26 @@ object MessageDetailScreen : Screen {
                     },
                     actions = {
                         IconButton(onClick = {
-                            // TODO: Implement Text-to-Speech on message content
+                            if (isMessagePlaying.value) {
+                                textToSpeechManager.stopSpeaking()
+                                isMessagePlaying.value = false
+                            } else {
+                                textToSpeechManager.startSpeaking(
+                                    messageDetail?.content.orEmpty()
+                                ){
+                                    isMessagePlaying.value = false
+                                }
+                                isMessagePlaying.value = true
+                            }
                         }) {
+                            val icon = if (isMessagePlaying.value) {
+                                R.drawable.ic_stop
+                            } else {
+                                R.drawable.ic_volume_up
+                            }
+
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_volume_up),
+                                painter = painterResource(id = icon),
                                 contentDescription = stringResource(R.string.content_description_volume_up),
                                 modifier = Modifier.size(Dimension.Icon.dp),
                                 tint = MaterialTheme.colorScheme.onSurface
@@ -285,9 +306,17 @@ object MessageDetailScreen : Screen {
 
         if (selectedSection != null) {
             val section = messageDetail?.sections?.find { it.id == selectedSection }
+            textToSpeechManager.stopSpeaking()
+            isMessagePlaying.value = false
+            isSectionPlaying.value = false
 
             ModalBottomSheet(
-                onDismissRequest = { selectedSection = null },
+                onDismissRequest = {
+                    selectedSection = null
+                    textToSpeechManager.stopSpeaking()
+                    isMessagePlaying.value = false
+                    isSectionPlaying.value = false
+                },
                 sheetState = bottomSheetState,
                 containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
             ) {
@@ -308,9 +337,26 @@ object MessageDetailScreen : Screen {
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Spacer(modifier = Modifier.width(Dimension.Spacing.XS.dp))
-                        IconButton(onClick = {}) {
+                        IconButton(onClick = {
+                            if (isSectionPlaying.value) {
+                                textToSpeechManager.stopSpeaking()
+                                isSectionPlaying.value = false
+                            } else {
+                                textToSpeechManager.startSpeaking(
+                                    section?.content.orEmpty()
+                                ){
+                                    isSectionPlaying.value = false
+                                }
+                                isSectionPlaying.value = true
+                            }
+                        }) {
+                            val icon = if (isSectionPlaying.value) {
+                                R.drawable.ic_stop
+                            } else {
+                                R.drawable.ic_volume_up
+                            }
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_volume_up),
+                                painter = painterResource(id = icon),
                                 contentDescription = stringResource(R.string.content_description_volume_up),
                                 modifier = Modifier.size(Dimension.Spacing.L.dp),
                                 tint = MaterialTheme.colorScheme.onSurface
