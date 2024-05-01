@@ -1,0 +1,24 @@
+CREATE TABLE Article (
+    id TEXT PRIMARY KEY NOT NULL,
+    dateCreated INTEGER NOT NULL,
+    dateUpdated INTEGER,
+    readTime INTEGER NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO Article
+VALUES(?, ?, ?, ?);
+
+getById:
+SELECT *
+FROM Article
+WHERE id = :id;
+
+getArticleWithTranslation:
+SELECT a.id, a.dateCreated, a.dateUpdated, a.readTime,
+       at.title, at.teaser, at.content
+FROM Article a
+JOIN ArticleTranslationRelation atr ON a.id = atr.articleId
+JOIN ArticleTranslation at ON atr.articleTranslationId = at.id
+WHERE a.id = ? AND at.languagesCode = (SELECT code FROM TranslationLanguage WHERE selected = 1);

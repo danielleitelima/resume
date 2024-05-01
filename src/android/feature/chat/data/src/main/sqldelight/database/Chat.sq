@@ -1,0 +1,29 @@
+CREATE TABLE Chat (
+    id TEXT PRIMARY KEY NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO Chat
+VALUES(?);
+
+getById:
+SELECT *
+FROM Chat
+WHERE id = :id;
+
+getAllWithValidMessages:
+SELECT Chat.id, GROUP_CONCAT(Message.id) AS messages
+FROM Chat
+JOIN ChatMessageRelation ON Chat.id = ChatMessageRelation.chatId
+JOIN Message ON ChatMessageRelation.messageId = Message.id
+GROUP BY Chat.id
+HAVING COUNT(Message.id) > 0;
+
+getByIdWithMessages:
+SELECT Chat.id, GROUP_CONCAT(Message.id) AS messages
+FROM Chat
+LEFT JOIN ChatMessageRelation ON Chat.id = ChatMessageRelation.chatId
+LEFT JOIN Message ON ChatMessageRelation.messageId = Message.id
+WHERE Chat.id = :id
+GROUP BY Chat.id;

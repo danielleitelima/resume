@@ -22,7 +22,7 @@ class IArticleListViewModel(
 
                     setState {
                         copy(
-                            relatedArticles = messageDetail.relatedArticles
+                            articles = messageDetail.articles
                         )
                     }
                 }

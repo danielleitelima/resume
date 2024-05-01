@@ -25,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavBackStackEntry
 import com.danielleitelima.resume.chat.presentation.R
+import com.danielleitelima.resume.chat.presentation.screen.component.toArticleDate
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
 import com.danielleitelima.resume.foundation.presentation.foundation.Screen
 import com.danielleitelima.resume.foundation.presentation.foundation.getKoinInstance
@@ -97,7 +98,7 @@ object ArticleDetailScreen : Screen {
                     Text(
                         text = stringResource(
                             R.string.message_detail_read_time,
-                            article.date,
+                            article.lastUpdate.toArticleDate(),
                             article.readTime
                         ),
                         style = MaterialTheme.typography.labelLarge,
@@ -105,7 +106,7 @@ object ArticleDetailScreen : Screen {
                     )
                     Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
                     Text(
-                        text = article.description,
+                        text = article.teaser,
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                     )

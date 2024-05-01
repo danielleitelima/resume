@@ -40,7 +40,7 @@ val chatPresentationModule = module {
     factory<ArticleListViewModel> { IArticleListViewModel(get()) }
     factory<CreationViewModel> { ICreationViewModel(get()) }
     factory<ExpressionListViewModel> { IExpressionListViewModel(get()) }
-    factory<HomeViewModel> { IHomeViewModel(get()) }
+    factory<HomeViewModel> { IHomeViewModel(get(), get()) }
     factory<MessageDetailViewModel> { IMessageDetailViewModel(get()) }
-    factory<MessageListViewModel> { IMessageListViewModel(get(), get(), get(), get()) }
+    factory<MessageListViewModel> { IMessageListViewModel(get(), get(), get()) }
 }

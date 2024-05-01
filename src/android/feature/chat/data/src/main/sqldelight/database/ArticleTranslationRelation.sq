@@ -1,0 +1,18 @@
+CREATE TABLE ArticleTranslationRelation (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    articleId TEXT NOT NULL,
+    articleTranslationId TEXT NOT NULL
+);
+
+insert:
+INSERT INTO ArticleTranslationRelation (articleId, articleTranslationId)
+SELECT :articleId, :articleTranslationId
+WHERE NOT EXISTS (
+    SELECT 1 FROM ArticleTranslationRelation
+    WHERE articleId = :articleId AND articleTranslationId = :articleTranslationId
+);
+
+getByArticleId:
+SELECT *
+FROM ArticleTranslationRelation
+WHERE articleId = :articleId;

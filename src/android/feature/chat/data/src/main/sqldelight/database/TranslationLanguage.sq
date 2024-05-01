@@ -1,0 +1,40 @@
+import kotlin.Boolean;
+
+CREATE TABLE TranslationLanguage (
+    id TEXT PRIMARY KEY NOT NULL,
+    code TEXT NOT NULL,
+    selected INTEGER AS Boolean DEFAULT 0,
+    flagUrl TEXT NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO TranslationLanguage
+VALUES(?, ?, ?, ?);
+
+getSelected:
+SELECT *
+FROM TranslationLanguage
+WHERE selected = 1;
+
+setSelected:
+UPDATE TranslationLanguage
+SET selected = CASE WHEN code = ? THEN 1 ELSE 0 END;
+
+deleteAll:
+DELETE
+FROM TranslationLanguage;
+
+getCompleteTranslationLanguages:
+SELECT tl.code, tlt.name, tl.flagUrl, tl.selected
+FROM TranslationLanguage tl
+LEFT JOIN TranslationLanguageTranslationRelation tlr ON tl.id = tlr.translationLanguageId
+LEFT JOIN TranslationLanguageTranslation tlt ON tlr.translationLanguageTranslationId = tlt.id
+WHERE tlt.languagesCode = (SELECT code FROM TranslationLanguage WHERE selected = 1);
+
+getSelectedTranslationLanguage:
+SELECT tl.code, tlt.name, tl.flagUrl, tl.selected
+FROM TranslationLanguage tl
+JOIN TranslationLanguageTranslationRelation tlr ON tl.id = tlr.translationLanguageId
+JOIN TranslationLanguageTranslation tlt ON tlr.translationLanguageTranslationId = tlt.id
+WHERE tl.selected = 1 AND tlt.languagesCode = tl.code;

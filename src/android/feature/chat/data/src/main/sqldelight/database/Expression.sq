@@ -1,0 +1,27 @@
+CREATE TABLE Expression(
+    id TEXT PRIMARY KEY NOT NULL,
+    content TEXT NOT NULL,
+    languagesCode TEXT NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO Expression
+VALUES(?, ?, ?);
+
+getAll:
+SELECT *
+FROM Expression;
+
+getById:
+SELECT *
+FROM Expression
+WHERE id = :id;
+
+getExpressionWithTranslation:
+SELECT
+    e.id, e.content, et.description
+FROM Expression e
+JOIN ExpressionTranslationRelation etr ON e.id = etr.expressionId
+JOIN ExpressionTranslation et ON etr.expressionTranslationId = et.id
+WHERE e.id = ? AND et.languagesCode = (SELECT code FROM TranslationLanguage WHERE selected = 1);

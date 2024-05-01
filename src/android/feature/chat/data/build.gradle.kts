@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.sqldelight)
 }
 
 android {
@@ -46,12 +48,28 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.browser)
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.scalars)
-    implementation(libs.retrofit.converter.gson)
 
+    implementation(libs.ktor.core)
+    implementation(libs.ktor.serialization)
+    implementation(libs.ktor.logging)
+    implementation(libs.ktor.android)
+    implementation(libs.kotlin.serialization)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.serialization.kotlinx.json.jvm)
+
+    implementation(libs.sqldelight.driver)
+    implementation(libs.sqldelight.coroutines)
 
     implementation(project(":feature:chat:domain"))
     implementation(project(":foundation:data"))
     implementation(project(":foundation:domain"))
+}
+
+sqldelight {
+    databases {
+        create("Database") {
+            packageName.set("com.danielleitelima.resume.chat.data")
+        }
+    }
 }

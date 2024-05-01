@@ -1,0 +1,15 @@
+CREATE TABLE ExampleTranslation (
+    id TEXT PRIMARY KEY NOT NULL,
+    content TEXT NOT NULL,
+    languagesCode TEXT NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO ExampleTranslation
+VALUES(?, ?, ?);
+
+getById:
+SELECT *
+FROM ExampleTranslation
+WHERE id = :id;

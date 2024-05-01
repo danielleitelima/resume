@@ -1,23 +1,22 @@
 package com.danielleitelima.resume.chat.presentation.screen.creation
 
 import androidx.lifecycle.viewModelScope
-import com.danielleitelima.resume.chat.domain.usecase.GetAvailableChat
+import com.danielleitelima.resume.chat.domain.usecase.GetChats
 import kotlinx.coroutines.launch
 
 
 class ICreationViewModel(
-    private val getAvailableChat: GetAvailableChat
+    private val getChats: GetChats
 ) : CreationViewModel() {
 
     init {
         viewModelScope.launch {
-            getAvailableChat().collect{
-                setState {
-                    copy(
-                        availableChats = it,
-                        isLoading = false
-                    )
-                }
+            val chats = getChats()
+            setState {
+                copy(
+                    chats = chats,
+                    isLoading = false
+                )
             }
         }
     }

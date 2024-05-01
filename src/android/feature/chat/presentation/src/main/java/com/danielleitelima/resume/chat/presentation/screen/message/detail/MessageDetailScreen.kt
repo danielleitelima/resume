@@ -21,8 +21,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -40,7 +38,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,8 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavBackStackEntry
 import com.danielleitelima.resume.chat.domain.Expression
-import com.danielleitelima.resume.chat.domain.RelatedArticle
 import com.danielleitelima.resume.chat.presentation.R
+import com.danielleitelima.resume.chat.presentation.screen.component.ArticleItem
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
 import com.danielleitelima.resume.foundation.presentation.foundation.Route
 import com.danielleitelima.resume.foundation.presentation.foundation.Screen
@@ -98,7 +95,7 @@ object MessageDetailScreen : Screen {
 
         val navController = LocalNavHostController.current
 
-        var selectedSection by rememberSaveable { mutableStateOf<String?>(null) }
+        var selectedSection by remember { mutableStateOf<String?>(null) }
         val bottomSheetState = rememberModalBottomSheetState(
             skipPartiallyExpanded = true
         )
@@ -107,7 +104,7 @@ object MessageDetailScreen : Screen {
         val messageDetail = state.messageDetail
 
         val expressionPagerState = rememberPagerState(pageCount = { messageDetail?.expressions?.size ?: 0})
-        val relatedArticlePagerState = rememberPagerState(pageCount = { messageDetail?.relatedArticles?.size ?: 0})
+        val relatedArticlePagerState = rememberPagerState(pageCount = { messageDetail?.articles?.size ?: 0})
 
         val onRelatedArticleClick: (String) -> Unit = {
             navController.navigate(ArticleDetail.routeWithArguments(it))
@@ -280,10 +277,14 @@ object MessageDetailScreen : Screen {
                         contentPadding = PaddingValues(horizontal = Dimension.Spacing.L.dp),
                         pageSpacing = Dimension.Spacing.S.dp,
                     ) {position ->
-                        val article = messageDetail.relatedArticles[position]
+                        val article = messageDetail.articles[position]
 
-                        RelatedArticleItem(
-                            relatedArticle = article,
+                        val configuration = LocalConfiguration.current
+                        val width = configuration.screenWidthDp.dp - (48.dp)
+
+                        ArticleItem(
+                            modifier = Modifier.width(width),
+                            article = article,
                             onClick = onRelatedArticleClick,
                         )
                     }
@@ -365,16 +366,16 @@ object MessageDetailScreen : Screen {
                     }
                     Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
 
-                    val meaning = section?.meaning
+                    val mainMeaning = section?.meanings?.first { it.main }
 
                     Text(
-                        text = meaning?.content.orEmpty(),
+                        text = mainMeaning?.translation.orEmpty(),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
 
-                    meaning?.examples?.forEach { example ->
+                    mainMeaning?.examples?.forEach { example ->
                         Text(
                             text = example.content,
                             style = MaterialTheme.typography.bodySmall,
@@ -384,6 +385,13 @@ object MessageDetailScreen : Screen {
                     }
 
                     Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+
+                    val otherMeanings = section?.meanings?.filter { it.main.not() }
+
+                    if (otherMeanings.isNullOrEmpty()) {
+                        return@Column
+                    }
+
                     HorizontalDivider()
                     Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
                     Text(
@@ -394,9 +402,9 @@ object MessageDetailScreen : Screen {
                         textAlign = TextAlign.Center,
                     )
 
-                    section?.otherMeanings?.forEach { otherMeaning ->
+                    otherMeanings.forEach { otherMeaning ->
                         Text(
-                            text = otherMeaning.content,
+                            text = otherMeaning.translation,
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -450,7 +458,7 @@ fun ExpressionItem(
         )
         Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
         Text(
-            text = expression.content,
+            text = expression.description,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 2,
@@ -469,67 +477,6 @@ fun ExpressionItem(
         )
     }
 }
-
-@Composable
-private fun RelatedArticleItem(
-    modifier: Modifier = Modifier,
-    relatedArticle: RelatedArticle,
-    onClick: (String) -> Unit = {},
-) {
-    val configuration = LocalConfiguration.current
-
-    // TODO: Optimize this logic
-    val width = configuration.screenWidthDp.dp - (48.dp)
-
-    Card(
-        modifier = modifier
-            .width(width)
-            .height(140.dp),
-        shape = RoundedCornerShape(Dimension.CornerRadius.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = Dimension.Elevation.dp
-        ),
-        onClick = { onClick(relatedArticle.id) },
-    ) {
-        Column(
-            modifier = Modifier.padding(Dimension.Spacing.M.dp),
-        ) {
-            Text(
-                text = relatedArticle.title,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
-            Text(
-                text = relatedArticle.description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(modifier = Modifier.weight(1.0f))
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.End),
-                text = stringResource(
-                    R.string.message_detail_read_time,
-                    relatedArticle.date,
-                    relatedArticle.readTime
-                ),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.End,
-            )
-        }
-    }
-}
-
 @Composable
 private fun ExtendedSpansText(
     text: AnnotatedString,

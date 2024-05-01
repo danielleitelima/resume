@@ -1,0 +1,24 @@
+CREATE TABLE ChatMessageRelation (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    chatId TEXT NOT NULL,
+    messageId TEXT NOT NULL
+);
+
+insert:
+INSERT INTO ChatMessageRelation (chatId, messageId)
+SELECT :chatId, :messageId
+WHERE NOT EXISTS (
+    SELECT 1 FROM ChatMessageRelation
+    WHERE chatId = :chatId AND messageId = :messageId
+);
+
+getByChatId:
+SELECT *
+FROM ChatMessageRelation
+WHERE chatId = :chatId;
+
+deleteByChatAndMessageIds:
+DELETE
+FROM ChatMessageRelation
+WHERE chatId = ?
+AND messageId IN ?;

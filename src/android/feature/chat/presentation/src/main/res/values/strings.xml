@@ -4,6 +4,8 @@
     <string name="content_description_info">Info</string>
     <string name="content_description_back">Back</string>
     <string name="content_description_chatting">Chatting Illustration</string>
+    <string name="content_description_chat_completed">Chat completed</string>
+
     <string name="home_title">Start your adventure</string>
     <string name="home_description">Step into your first chat and discover, learn, and grow as every message unfolds a new path in your language learning journey. Ready for the challenge?</string>
     <string name="content_description_create_chat">Create chat</string>
@@ -20,6 +22,10 @@
     <string name="content_description_send">Send</string>
     <string name="message_list_label_option">View message options</string>
     <string name="message_list_button_send">Send</string>
+    <string name="message_list_chat_completed_title">Chat completed</string>
+    <string name="message_list_chat_completed_description">This conversation reached it\'s end for the moment, but you can continue your journey exploring other chats.</string>
+    <string name="message_list_chat_completed_button_stay">Stay here</string>
+    <string name="message_list_chat_completed_button_explore">Explore</string>
     <string name="message_detail_title">Analysis</string>
     <string name="content_description_volume_up">Text to speech</string>
     <string name="message_detail_section_expression_label">Common expressions</string>
@@ -29,4 +35,8 @@
     <string name="message_detail_button_see_more">See more</string>
     <string name="expression_list_title">Common expressions</string>
     <string name="article_list_title">Related articles</string>
+    <string name="article_date_recently">Just now</string>
+    <string name="article_date_hours_ago">%1$s hours ago</string>
+    <string name="article_date_days_ago">%1$s days ago</string>
+
 </resources>

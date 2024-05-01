@@ -1,0 +1,15 @@
+CREATE TABLE ChatTranslation (
+    id TEXT PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    languagesCode TEXT NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO ChatTranslation
+VALUES(?, ?, ?);
+
+getById:
+SELECT *
+FROM ChatTranslation
+WHERE id = :id;

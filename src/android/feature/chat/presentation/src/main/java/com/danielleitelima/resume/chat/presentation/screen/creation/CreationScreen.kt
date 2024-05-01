@@ -54,7 +54,7 @@ object CreationScreen : Screen {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         val navController = LocalNavHostController.current
 
-        val availableChats = state.availableChats
+        val availableChats = state.chats
 
         Scaffold(
             topBar = {

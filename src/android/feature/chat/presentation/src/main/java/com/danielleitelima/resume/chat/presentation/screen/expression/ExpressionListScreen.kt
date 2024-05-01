@@ -132,7 +132,7 @@ fun ExpressionItem(
         )
         Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
         Text(
-            text = expression.content,
+            text = expression.description,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             overflow = TextOverflow.Ellipsis,
@@ -177,6 +177,7 @@ fun ExampleItem(
                 maxLines = maxLines,
             )
             Spacer(modifier = Modifier.size(Dimension.Spacing.XXS.dp))
+
             Text(
                 text = example.translation,
                 style = MaterialTheme.typography.bodyMedium,

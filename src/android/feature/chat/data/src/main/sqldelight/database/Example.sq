@@ -1,0 +1,24 @@
+CREATE TABLE Example (
+    id TEXT PRIMARY KEY NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO Example
+VALUES(?);
+
+getById:
+SELECT *
+FROM Example
+WHERE id = :id;
+
+getExampleWithTranslations:
+SELECT et1.id, et1.content AS targetContent, et2.content AS translationContent
+FROM Example e
+JOIN ExampleTranslationRelation etr1 ON e.id = etr1.exampleId
+JOIN ExampleTranslation et1 ON etr1.exampleTranslationId = et1.id
+JOIN ExampleTranslationRelation etr2 ON e.id = etr2.exampleId
+JOIN ExampleTranslation et2 ON etr2.exampleTranslationId = et2.id
+WHERE e.id = ?
+AND et1.languagesCode = (SELECT code FROM TargetLanguage WHERE selected = 1)
+AND et2.languagesCode = (SELECT code FROM TranslationLanguage WHERE selected = 1);

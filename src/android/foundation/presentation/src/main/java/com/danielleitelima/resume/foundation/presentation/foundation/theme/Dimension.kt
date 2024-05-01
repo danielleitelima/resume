@@ -5,9 +5,11 @@ import androidx.compose.ui.unit.Dp
 sealed class Dimension(
     val value: Int,
 ) {
+    data object Flag : Dimension(48)
     data object Icon : Dimension(24)
     data object CornerRadius : Dimension(12)
     data object Elevation : Dimension(4)
+    data object Stroke : Dimension(3)
 
     sealed class Spacing(
         value: Int,
