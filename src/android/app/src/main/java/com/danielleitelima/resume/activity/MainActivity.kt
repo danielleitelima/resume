@@ -21,6 +21,7 @@ import com.danielleitelima.resume.foundation.presentation.foundation.TextToSpeec
 import com.danielleitelima.resume.foundation.presentation.foundation.getKoinInstance
 import com.danielleitelima.resume.foundation.presentation.foundation.theme.AppTheme
 import com.danielleitelima.resume.home.presentation.foundation.registerHomeRoutes
+import com.danielleitelima.resume.home.presentation.screen.home.HomeScreen
 
 class MainActivity : ComponentActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +35,7 @@ class MainActivity : ComponentActivity(){
 
             MainScreenContent(
                 navController = navController,
-                startDestination = com.danielleitelima.resume.chat.presentation.screen.home.HomeScreen
+                startDestination = HomeScreen
             )
         }
     }

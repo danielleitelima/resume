@@ -18,20 +18,8 @@ data class Language(
     val selected: Boolean,
 )
 
-/*
-* An use case will observe the open chats. When the history of a chat changes it check if the last message is from the user.
-* If it is, it will fetch the first possible message option in full detail and update the chat history. (The business logic ensures that user messages will never have replies from user).
-* If it is not, it will fetch the reply options. If at least one of the reply options is not from the user, (The business logic ensures that there will be a single message from a non-user in the reply options or none at all).
-* it will fetch the full detail of this message and add it to the chat. (This will ensure a loop until a message that is from the user appears in the reply options).
-* Once all the possible replies are from the user, it will update the current message options.
-* */
 data class ActiveChat(
     val openChat: OpenChat,
-
-    /*
-    * If the current options are null and the open chat is not, it means that they are being fetched.
-    * Think of a better way to handle this.
-    * */
     val currentMessageOptions: List<MessageOption>? = null,
 )
 
@@ -48,6 +36,7 @@ data class OpenChat(
 
 data class SentMessage(
     val id: String,
+    val messageId: String,
     val isUserSent: Boolean,
     val timestamp: Long,
     val content: String
@@ -61,7 +50,6 @@ data class MessageOption(
 
 data class MessageDetail(
     val id : String,
-    val timestamp: Long?,
     val isUserSent: Boolean,
     val translation: String,
     val content: String,

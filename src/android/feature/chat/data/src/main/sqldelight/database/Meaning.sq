@@ -10,11 +10,6 @@ INSERT OR REPLACE
 INTO Meaning
 VALUES(?, ?);
 
-getById:
-SELECT *
-FROM Meaning
-WHERE id = :id;
-
 getMeaningWithTranslation:
 SELECT m.id, m.main, mt1.content AS targetContent, mt2.content AS translationContent
 FROM Meaning m

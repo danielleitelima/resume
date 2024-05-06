@@ -11,8 +11,3 @@ WHERE NOT EXISTS (
     SELECT 1 FROM ExampleTranslationRelation
     WHERE exampleId = :exampleId AND exampleTranslationId = :exampleTranslationId
 );
-
-getByExampleId:
-SELECT *
-FROM ExampleTranslationRelation
-WHERE exampleId = :exampleId;

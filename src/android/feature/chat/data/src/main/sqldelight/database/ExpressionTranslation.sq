@@ -8,8 +8,3 @@ insert:
 INSERT OR REPLACE
 INTO ExpressionTranslation
 VALUES(?, ?, ?);
-
-getById:
-SELECT *
-FROM ExpressionTranslation
-WHERE id = :id;

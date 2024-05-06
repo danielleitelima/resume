@@ -2,19 +2,13 @@ import kotlin.Boolean;
 
 CREATE TABLE Message (
     id TEXT PRIMARY KEY NOT NULL,
-    userSent INTEGER AS Boolean DEFAULT 0,
-    timestamp INTEGER DEFAULT NULL
+    userSent INTEGER AS Boolean DEFAULT 0
 );
 
 insert:
 INSERT OR REPLACE
 INTO Message
-VALUES(?, ?, ?);
-
-updateTimestamp:
-UPDATE Message
-SET timestamp = ?
-WHERE id = ?;
+VALUES(?, ?);
 
 getById:
 SELECT *

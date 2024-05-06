@@ -1,9 +1,5 @@
 package com.danielleitelima.resume.chat.presentation.screen.home
 
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -34,31 +30,29 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import coil.compose.AsyncImage
@@ -66,8 +60,10 @@ import coil.request.ImageRequest
 import com.danielleitelima.resume.chat.domain.Language
 import com.danielleitelima.resume.chat.domain.OpenChat
 import com.danielleitelima.resume.chat.presentation.R
+import com.danielleitelima.resume.chat.presentation.screen.component.toFormattedTime
 import com.danielleitelima.resume.foundation.presentation.component.Clickable
 import com.danielleitelima.resume.foundation.presentation.component.build
+import com.danielleitelima.resume.foundation.presentation.component.shimmerEffect
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
 import com.danielleitelima.resume.foundation.presentation.foundation.Route
 import com.danielleitelima.resume.foundation.presentation.foundation.Screen
@@ -80,6 +76,7 @@ import com.danielleitelima.resume.foundation.presentation.foundation.theme.Dimen
 import com.danielleitelima.resume.foundation.presentation.route.chat.Creation
 import com.danielleitelima.resume.foundation.presentation.route.chat.Home
 import com.danielleitelima.resume.foundation.presentation.route.chat.MessageList
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 object HomeScreen : Screen {
@@ -89,22 +86,18 @@ object HomeScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content(backStackEntry: NavBackStackEntry) {
-        val viewModel: HomeViewModel = rememberViewModel { getKoinInstance() }
+        val navController = LocalNavHostController.current
 
         val textToSpeechManager: TextToSpeechManager = remember { getKoinInstance() }
+        val viewModel: HomeViewModel = rememberViewModel { getKoinInstance() }
 
         val state by viewModel.state.collectAsState()
 
-        val navController = LocalNavHostController.current
+        val coroutineScope = rememberCoroutineScope()
 
         var openBottomSheet by remember { mutableStateOf(false) }
-        val bottomSheetState = rememberModalBottomSheetState(
-            skipPartiallyExpanded = true
-        )
 
-        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-        val openChats = state.chats
+        val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
         val selectedTargetLanguage = remember {
             mutableStateOf(state.selectedTargetLanguage)
@@ -163,7 +156,6 @@ object HomeScreen : Screen {
                     },
                     navigationIcon = {
                         IconButton(
-                            enabled = false,
                             onClick = {
                                 navController.popBackStack()
                             }
@@ -172,55 +164,26 @@ object HomeScreen : Screen {
                                 painter = painterResource(id = R.drawable.ic_arrow_back),
                                 contentDescription = stringResource(R.string.content_description_back),
                                 modifier = Modifier.size(Dimension.Icon.dp),
-                                tint = MaterialTheme.colorScheme.surfaceContainer
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     ),
-                    scrollBehavior = scrollBehavior,
+                    scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
                 )
             },
             content = {
+                val openChats = state.chats
+
                 if (state.isLoading){
-                    OpenChatListSkeleton(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(it)
-                    )
+                    OpenChatListSkeleton(modifier = Modifier.fillMaxSize().padding(it))
                     return@Scaffold
                 }
 
                 if (openChats.isEmpty()){
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(it)
-                            .padding(horizontal = Dimension.Spacing.XXL.dp, vertical = 130.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.illustration_chatting),
-                            contentDescription = stringResource(R.string.content_description_chatting),
-                            modifier = Modifier.size(200.dp),
-                            tint = MaterialTheme.colorScheme.outlineVariant
-                        )
-                        Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
-                        Text(
-                            text = stringResource(R.string.home_title),
-                            style = MaterialTheme.typography.headlineSmall,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                        Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
-                        Text(
-                            text = stringResource(R.string.home_description),
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                    }
+                    EmptyChatList(modifier = Modifier.padding(it))
                 } else {
                     OpenChatList(
                         modifier = Modifier
@@ -251,77 +214,154 @@ object HomeScreen : Screen {
         )
 
         if (openBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = { openBottomSheet = false },
-                sheetState = bottomSheetState,
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-            ) {
-                val isSelectionEnabled =
-                    selectedTargetLanguage.value != null &&
-                    selectedTranslationLanguage.value != null
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = Dimension.Spacing.XL.dp),
-                        text = "Your chat messages will be written in:",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Start
-                    )
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.L.dp))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Spacer(modifier = Modifier.width(Dimension.Spacing.L.dp))
-                        state.targetLanguages.forEach { language ->
-                            LanguageItem(
-                                language = language,
-                                selectedLanguage = selectedTargetLanguage.value
-                            ){
-                                selectedTargetLanguage.value = language
-                            }
-                            Spacer(modifier = Modifier.width(Dimension.Spacing.M.dp))
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.XL.dp))
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = Dimension.Spacing.XL.dp),
-                        text = "Your translations will be in:",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Start
-                    )
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.L.dp))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Spacer(modifier = Modifier.width(Dimension.Spacing.L.dp))
-                        state.translationLanguages.forEach { language ->
-                            LanguageItem(
-                                language = language,
-                                selectedLanguage = selectedTranslationLanguage.value
-                            ){
-                                selectedTranslationLanguage.value = language
-                            }
-                            Spacer(modifier = Modifier.width(Dimension.Spacing.M.dp))
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.XL.dp))
+            LanguageSelectionDialog(
+                bottomSheetState = bottomSheetState,
+                selectedTargetLanguage = selectedTargetLanguage,
+                selectedTranslationLanguage = selectedTranslationLanguage,
+                translationLanguages = state.translationLanguages,
+                targetLanguages = state.targetLanguages
+            ){
+                coroutineScope.launch {
+                    bottomSheetState.hide()
+                    openBottomSheet = false
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun EmptyChatList(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = Dimension.Spacing.XXL.dp, vertical = 130.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.illustration_chatting),
+            contentDescription = stringResource(R.string.content_description_chatting),
+            modifier = Modifier.size(200.dp),
+            tint = MaterialTheme.colorScheme.outlineVariant
+        )
+        Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
+        Text(
+            text = stringResource(R.string.home_title),
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.outline
+        )
+        Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
+        Text(
+            text = stringResource(R.string.home_description),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.outline
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun LanguageSelectionDialog(
+    modifier: Modifier = Modifier,
+    bottomSheetState: SheetState,
+    selectedTargetLanguage: MutableState<Language?>,
+    selectedTranslationLanguage: MutableState<Language?>,
+    translationLanguages: List<Language>,
+    targetLanguages: List<Language>,
+    onDismiss: () -> Unit = {},
+){
+    ModalBottomSheet(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        sheetState = bottomSheetState,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
+        val isSelectionEnabled = selectedTargetLanguage.value != null && selectedTranslationLanguage.value != null
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Dimension.Spacing.XL.dp),
+                text = stringResource(R.string.language_selection_dialog_target_description),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Start
+            )
+            Spacer(modifier = Modifier.height(Dimension.Spacing.L.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Spacer(modifier = Modifier.width(Dimension.Spacing.L.dp))
+                targetLanguages.forEach { language ->
+                    LanguageItem(
+                        language = language,
+                        selectedLanguage = selectedTargetLanguage.value
+                    ){
+                        selectedTargetLanguage.value = language
+                    }
+                    Spacer(modifier = Modifier.width(Dimension.Spacing.M.dp))
+                }
+            }
+            Spacer(modifier = Modifier.height(Dimension.Spacing.XL.dp))
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Dimension.Spacing.XL.dp),
+                text = stringResource(R.string.language_selection_dialog_translation_description),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Start
+            )
+            Spacer(modifier = Modifier.height(Dimension.Spacing.L.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Spacer(modifier = Modifier.width(Dimension.Spacing.L.dp))
+                translationLanguages.forEach { language ->
+                    LanguageItem(
+                        language = language,
+                        selectedLanguage = selectedTranslationLanguage.value
+                    ){
+                        selectedTranslationLanguage.value = language
+                    }
+                    Spacer(modifier = Modifier.width(Dimension.Spacing.M.dp))
+                }
+            }
+            Spacer(modifier = Modifier.height(Dimension.Spacing.L.dp))
+            Button(
+                modifier = Modifier
+                    .padding(horizontal = Dimension.Spacing.L.dp)
+                    .align(Alignment.End),
+                enabled = isSelectionEnabled,
+                onClick = onDismiss,
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_check),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(Dimension.Icon.dp),
+                )
+                Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
+                Text(
+                    text = stringResource(R.string.language_selection_dialog_button_confirm),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+            Spacer(modifier = Modifier.size(Dimension.Spacing.XL.dp))
         }
     }
 }
@@ -362,7 +402,7 @@ private fun LanguageItem(
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
-                        .width(Dimension.Flag.dp)
+                        .size(Dimension.Flag.dp)
                         .clip(RoundedCornerShape(2.dp))
                 )
                 Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
@@ -454,7 +494,7 @@ private fun OpenChatItem(
         Spacer(modifier = Modifier.width(Dimension.Spacing.M.dp))
         Text(
             modifier = Modifier,
-            text = "19:00 PM",
+            text = lastSentMessage?.timestamp.toFormattedTime(),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 1,
@@ -487,10 +527,10 @@ private fun OpenChatItemSkeleton() {
                     .widthIn(min = 100.dp)
                     .shimmerEffect(),
                 text = "",
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
             )
-            Spacer(modifier = Modifier.height(1.dp))
+            Spacer(modifier = Modifier.height(Dimension.Spacing.XXS.dp))
             Text(
                 modifier = Modifier
                     .widthIn(min = 160.dp)
@@ -511,7 +551,7 @@ private fun OpenChatItemSkeleton() {
 }
 
 @Composable
-fun InitialAvatar(name: String) {
+private fun InitialAvatar(name: String) {
     val parts = name.split(" ").mapNotNull { it.firstOrNull()?.toString() }
     val initials = if (parts.size > 1) {
         "${parts.first()}${parts.last()}"
@@ -532,33 +572,4 @@ fun InitialAvatar(name: String) {
             color = MaterialTheme.colorScheme.primary
         )
     }
-}
-
-fun Modifier.shimmerEffect(): Modifier = composed {
-    var size by remember {
-        mutableStateOf(IntSize.Zero)
-    }
-    val transition = rememberInfiniteTransition()
-    val startOffsetX by transition.animateFloat(
-        initialValue = -2 * size.width.toFloat(),
-        targetValue = 2 * size.width.toFloat(),
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000)
-        )
-    )
-
-    background(
-        brush = Brush.linearGradient(
-            colors = listOf(
-                MaterialTheme.colorScheme.surfaceContainer,
-                MaterialTheme.colorScheme.surfaceContainerHigh,
-                MaterialTheme.colorScheme.surfaceContainer,
-            ),
-            start = Offset(startOffsetX, 0f),
-            end = Offset(startOffsetX + size.width.toFloat(), size.height.toFloat())
-        )
-    )
-        .onGloballyPositioned {
-            size = it.size
-        }
 }

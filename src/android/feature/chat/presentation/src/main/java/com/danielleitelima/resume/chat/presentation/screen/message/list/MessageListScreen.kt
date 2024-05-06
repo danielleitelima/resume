@@ -32,6 +32,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -41,6 +42,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -68,8 +70,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import com.danielleitelima.resume.chat.domain.MessageOption
+import com.danielleitelima.resume.chat.domain.OpenChat
 import com.danielleitelima.resume.chat.domain.SentMessage
 import com.danielleitelima.resume.chat.presentation.R
+import com.danielleitelima.resume.chat.presentation.screen.component.toFormattedTime
 import com.danielleitelima.resume.foundation.presentation.component.Clickable
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
 import com.danielleitelima.resume.foundation.presentation.foundation.Screen
@@ -80,7 +84,6 @@ import com.danielleitelima.resume.foundation.presentation.foundation.theme.Dimen
 import com.danielleitelima.resume.foundation.presentation.route.chat.MessageDetail
 import com.danielleitelima.resume.foundation.presentation.route.chat.MessageList
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 object MessageListScreen : Screen {
     private const val ANIMATION_DURATION = 300
@@ -91,39 +94,24 @@ object MessageListScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationGraphicsApi::class)
     @Composable
     override fun Content(backStackEntry: NavBackStackEntry) {
+        val context = LocalContext.current
+        val navController = LocalNavHostController.current
+
         val viewModel: MessageListViewModel = rememberViewModel { getKoinInstance() }
         val state by viewModel.state.collectAsState()
 
         val chatId = remember { route.getChatId(backStackEntry) }
+        var showRollbackDialog by remember { mutableStateOf(false) }
+        var openBottomSheet by remember { mutableStateOf(false) }
+        var selectedMessageId by remember { mutableStateOf<String?>(null) }
+        val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        val coroutineScope = rememberCoroutineScope()
 
         LaunchedEffect(chatId) {
             if (chatId != null){
                 viewModel.setEvent(MessageListContract.Event.LoadChat(chatId))
             }
         }
-
-        val navController = LocalNavHostController.current
-
-        var openBottomSheet by remember { mutableStateOf(false) }
-
-        var selectedMessageId by remember { mutableStateOf<String?>(null) }
-        var selectedMessageOptionId by remember { mutableStateOf<String?>(null) }
-
-        val bottomSheetState = rememberModalBottomSheetState(
-            skipPartiallyExpanded = true,
-//            confirmValueChange = {
-//                if(it == SheetValue.Hidden){
-//                    selectedMessageOptionId = null
-//                    openBottomSheet = false
-//                }
-//                true
-//            }
-        )
-        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-        val context = LocalContext.current
-
-        val coroutineScope = rememberCoroutineScope()
 
         Scaffold(
             topBar = {
@@ -172,14 +160,12 @@ object MessageListScreen : Screen {
 
                         IconButton(
                             onClick = {
-                                val messageContent = state.openChat?.history?.find { it.id == selectedMessageId }?.content.orEmpty()
-                                context.copyToClipboard(messageContent, context.getString(R.string.message_list_alert_content_copy))
-                                selectedMessageId = null
+                                showRollbackDialog = true
                             }
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_content_copy),
-                                contentDescription = stringResource(R.string.content_description_copy),
+                                painter = painterResource(id = R.drawable.ic_rewind),
+                                contentDescription = stringResource(R.string.content_description_undo),
                                 modifier = Modifier
                                     .size(Dimension.Icon.dp)
                                     .scale(scale.value),
@@ -189,15 +175,17 @@ object MessageListScreen : Screen {
 
                         IconButton(
                             onClick = {
-                                viewModel.setEvent(
-                                    MessageListContract.Event.RollbackToMessage(selectedMessageId.orEmpty())
-                                )
+                                val messageContent = state.openChat?.history?.find {
+                                    it.messageId == selectedMessageId
+                                }?.content.orEmpty()
+
+                                context.copyToClipboard(messageContent, context.getString(R.string.message_list_alert_content_copy))
                                 selectedMessageId = null
                             }
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_rewind),
-                                contentDescription = stringResource(R.string.content_description_undo),
+                                painter = painterResource(id = R.drawable.ic_content_copy),
+                                contentDescription = stringResource(R.string.content_description_copy),
                                 modifier = Modifier
                                     .size(Dimension.Icon.dp)
                                     .scale(scale.value),
@@ -221,259 +209,372 @@ object MessageListScreen : Screen {
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     ),
-                    scrollBehavior = scrollBehavior,
+                    scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
                 )
             },
-            content = {
-                if (state.isLoading){
+            content = { paddingValues ->
+                val openChat = state.openChat
+
+                if (state.isLoading || openChat == null){
                     return@Scaffold
                 }
 
                 if (state.openChat?.history.orEmpty().isEmpty()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(it)
-                            .padding(horizontal = Dimension.Spacing.L.dp)
-                            .verticalScroll(rememberScrollState()),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Spacer(modifier = Modifier.size(130.dp))
-                        Icon(
-                            painter = painterResource(id = R.drawable.illustration_coiled_arrow),
-                            contentDescription = stringResource(R.string.content_description_coiled_arrow),
-                            modifier = Modifier.size(200.dp),
-                            tint = MaterialTheme.colorScheme.outlineVariant
-                        )
-                        Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
-                        Text(
-                            text = stringResource(R.string.message_list_empty_description),
-                            style = MaterialTheme.typography.headlineSmall,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                    }
+                    EmptyChatView(
+                        modifier = Modifier.padding(paddingValues)
+                    )
                     return@Scaffold
                 }
 
-                val lastIndex =
-                    if (state.openChat?.history.orEmpty().isEmpty()) 0
-                    else state.openChat?.history.orEmpty().size - 1
-
-                val listState = rememberLazyListState(
-                    initialFirstVisibleItemIndex = lastIndex
+                MessageListView(
+                    modifier = Modifier.padding(paddingValues),
+                    selectedMessageId = selectedMessageId,
+                    openChat = openChat,
+                    onMessageSelected = {
+                        selectedMessageId = null
+                    },
+                    onMessageLongPressed = {
+                        selectedMessageId = it
+                    }
                 )
-
-                val items = state.openChat?.history.orEmpty()
-
-                LaunchedEffect(key1 = state.openChat?.history) {
-                    listState.animateScrollToItem(index = lastIndex)
-                }
-
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(it)
-                    ,
-                    state = listState
-                ) {
-                    item {
-                        Spacer(modifier = Modifier.size(Dimension.Spacing.M.dp))
-                    }
-                    items(items.size) { sentMessageId ->
-                        val sentMessage = items[sentMessageId]
-
-                        val isSelected = selectedMessageId == sentMessage.id
-
-                        SentMessageItem(
-                            sentMessage = sentMessage,
-                            isSelected = isSelected,
-                            onClick = { selectedMessageId = null },
-                            onLongPress = { id -> selectedMessageId = id }
-                        )
-
-                        Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
-                    }
-                    item {
-                        Spacer(modifier = Modifier.size(Dimension.Spacing.XXS.dp))
-                    }
-                }
             },
             bottomBar = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
-                        .padding(Dimension.Spacing.M.dp)
-                ) {
-                    val isLoading = state.messageOptions == null
+                val isLoading = state.messageOptions == null
 
-                    val buttonColor = if (isLoading) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.primary
-
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .clip(RoundedCornerShape(Dimension.CornerRadius.dp))
-                            .clickable {
-                                if (isLoading) return@clickable
-                                openBottomSheet = true
-                            },
-                    )  {
-                        Row(
-                            modifier = Modifier
-                                .padding(Dimension.Spacing.S.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_send),
-                                contentDescription = stringResource(R.string.content_description_send),
-                                modifier = Modifier.size(Dimension.Icon.dp),
-                                tint = buttonColor
-                            )
-                            Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
-                            Text(
-                                text = stringResource(R.string.message_list_label_option),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = buttonColor,
-                            )
+                BottomBar(
+                    enabled = isLoading.not(),
+                    onClick = {
+                        openBottomSheet = true
+                        coroutineScope.launch {
+                            bottomSheetState.show()
                         }
                     }
-
-                }
+                )
             }
         )
 
-        if (openBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    openBottomSheet = false
-                    selectedMessageOptionId = ""
+        if (showRollbackDialog) {
+            RollbackDialog(
+                onConfirm = {
+                    viewModel.setEvent(
+                        MessageListContract.Event.RollbackToMessage(selectedMessageId.orEmpty())
+                    )
                 },
-                sheetState = bottomSheetState,
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-            ) {
-                if (state.messageOptions.isNullOrEmpty()){
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .padding(
-                                bottom = Dimension.Spacing.L.dp,
-                                start = Dimension.Spacing.L.dp,
-                                end = Dimension.Spacing.L.dp
-                            )
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.illustration_chat_completed),
-                            contentDescription = stringResource(R.string.content_description_chat_completed),
-                            modifier = Modifier.size(150.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
-                        Column(
-                            modifier = Modifier.padding(horizontal = Dimension.Spacing.L.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Text(
-                                text = stringResource(R.string.message_list_chat_completed_title),
-                                style = MaterialTheme.typography.headlineSmall,
-                                textAlign = TextAlign.Center,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
-                            Text(
-                                text = stringResource(R.string.message_list_chat_completed_description),
-                                style = MaterialTheme.typography.bodyMedium,
-                                textAlign = TextAlign.Center,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                        Spacer(modifier = Modifier.size(Dimension.Spacing.XL.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            TextButton(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        bottomSheetState.hide()
-                                        openBottomSheet = false
-                                    }
-                                },
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.message_list_chat_completed_button_stay),
-                                    style = MaterialTheme.typography.labelLarge,
-                                )
-                            }
-
-                            Button(
-                                onClick = {
-                                    navController.popBackStack()
-                                    openBottomSheet = false
-                                },
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.message_list_chat_completed_button_explore),
-                                    style = MaterialTheme.typography.labelLarge,
-                                )
-                            }
-                        }
-                    }
-                } else{
-                    Column(
-                        modifier = Modifier.padding(horizontal = Dimension.Spacing.L.dp),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        state.messageOptions?.forEach {
-                            MessageOptionItem(
-                                messageOption = it,
-                                isSelected = selectedMessageOptionId == it.id,
-                            ){
-                                selectedMessageOptionId = if (selectedMessageOptionId == it.id) "" else it.id
-                            }
-
-                            Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
-                        }
-                        Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
-
-                        Button(
-                            enabled = selectedMessageOptionId.orEmpty().isNotEmpty(),
-                            onClick = {
-                                viewModel.setEvent(
-                                    MessageListContract.Event.SelectMessageOption(
-                                        selectedMessageOptionId.orEmpty()
-                                    )
-                                )
-
-                                coroutineScope.launch {
-                                    bottomSheetState.hide()
-                                    openBottomSheet = false
-                                    selectedMessageOptionId = ""
-                                }
-                            },
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_send),
-                                contentDescription = stringResource(R.string.content_description_send),
-                                modifier = Modifier
-                                    .size(Dimension.Icon.dp),
-                            )
-                            Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
-                            Text(
-                                text = stringResource(R.string.message_list_button_send),
-                                style = MaterialTheme.typography.labelLarge,
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
-                    }
+                onDismiss = {
+                    selectedMessageId = null
+                    showRollbackDialog = false
                 }
+            )
+        }
+
+        if (openBottomSheet) {
+            MessageOptionModal(
+                bottomSheetState = bottomSheetState,
+                messageOptions = state.messageOptions.orEmpty(),
+                onDismiss = {
+                    openBottomSheet = false
+                },
+                onOptionSelected = {
+                    viewModel.setEvent(MessageListContract.Event.SelectMessageOption(it))
+
+                    coroutineScope.launch {
+                        bottomSheetState.hide()
+                        openBottomSheet = false
+                    }
+                },
+                onStay = {
+                    coroutineScope.launch {
+                        bottomSheetState.hide()
+                        openBottomSheet = false
+                    }
+                },
+                onExplore = {
+                    navController.popBackStack()
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun MessageListView(
+    modifier: Modifier = Modifier,
+    selectedMessageId: String?,
+    openChat: OpenChat,
+    onMessageSelected: (String) -> Unit,
+    onMessageLongPressed: (String) -> Unit
+){
+    val lastIndex =
+        if (openChat.history.isEmpty()) 0
+        else openChat.history.size - 1
+
+    val listState = rememberLazyListState(
+        initialFirstVisibleItemIndex = lastIndex
+    )
+
+    val items = openChat.history
+
+    LaunchedEffect(key1 = openChat.history) {
+        listState.animateScrollToItem(index = lastIndex)
+    }
+
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize(),
+        state = listState
+    ) {
+        item {
+            Spacer(modifier = Modifier.size(Dimension.Spacing.M.dp))
+        }
+        items(items.size) { sentMessageId ->
+            val sentMessage = items[sentMessageId]
+
+            val isSelected = selectedMessageId == sentMessage.messageId
+
+            SentMessageItem(
+                sentMessage = sentMessage,
+                isSelected = isSelected,
+                onClick = onMessageSelected,
+                onLongPress = onMessageLongPressed
+            )
+
+            Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
+        }
+        item {
+            Spacer(modifier = Modifier.size(Dimension.Spacing.XXS.dp))
+        }
+    }
+}
+
+@Composable
+private fun EmptyChatView(
+    modifier: Modifier = Modifier
+){
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = Dimension.Spacing.L.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Spacer(modifier = Modifier.size(130.dp))
+        Icon(
+            painter = painterResource(id = R.drawable.illustration_coiled_arrow),
+            contentDescription = stringResource(R.string.content_description_coiled_arrow),
+            modifier = Modifier.size(200.dp),
+            tint = MaterialTheme.colorScheme.outlineVariant
+        )
+        Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
+        Text(
+            text = stringResource(R.string.message_list_empty_description),
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.outline
+        )
+    }
+}
+
+@Composable
+private fun BottomBar(
+    enabled: Boolean,
+    onClick: () -> Unit
+){
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(Dimension.Spacing.M.dp)
+    ) {
+        val buttonColor = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .clip(RoundedCornerShape(Dimension.CornerRadius.dp))
+                .clickable {
+                    if (enabled.not()) return@clickable
+                    onClick()
+                },
+        )  {
+            Row(
+                modifier = Modifier
+                    .padding(Dimension.Spacing.S.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_send),
+                    contentDescription = stringResource(R.string.content_description_send),
+                    modifier = Modifier.size(Dimension.Icon.dp),
+                    tint = buttonColor
+                )
+                Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
+                Text(
+                    text = stringResource(R.string.message_list_label_option),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = buttonColor,
+                )
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MessageOptionModal(
+    modifier: Modifier = Modifier,
+    bottomSheetState: SheetState,
+    messageOptions: List<MessageOption>,
+    onDismiss: () -> Unit = {},
+    onOptionSelected: (String) -> Unit = {},
+    onStay: () -> Unit = {},
+    onExplore: () -> Unit = {}
+) {
+    ModalBottomSheet(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        sheetState = bottomSheetState,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
+        if (messageOptions.isEmpty()){
+            CompletedChatView(
+                onExplore = onExplore,
+                onStay = onStay
+            )
+        } else{
+            MessageOptionList(
+                messageOptions = messageOptions.orEmpty(),
+                onOptionSelected = onOptionSelected
+            )
+        }
+    }
+}
+
+@Composable
+private fun MessageOptionList(
+    messageOptions: List<MessageOption>,
+    onOptionSelected: (String) -> Unit
+){
+    var selectedMessageOptionId by remember { mutableStateOf<String?>(null) }
+
+    Column(
+        modifier = Modifier.padding(horizontal = Dimension.Spacing.L.dp),
+        horizontalAlignment = Alignment.End
+    ) {
+        messageOptions.forEach {
+            MessageOptionItem(
+                messageOption = it,
+                isSelected = selectedMessageOptionId == it.id,
+            ){
+                selectedMessageOptionId = if (selectedMessageOptionId == it.id) "" else it.id
+            }
+
+            Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
+        }
+        Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
+
+        SendButton(
+            enabled = selectedMessageOptionId.orEmpty().isNotEmpty(),
+            onClick = {
+                onOptionSelected(selectedMessageOptionId.orEmpty())
+            },
+        )
+
+        Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
+    }
+}
+
+@Composable
+private fun CompletedChatView(
+    onExplore: () -> Unit,
+    onStay: () -> Unit
+){
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(
+                bottom = Dimension.Spacing.L.dp,
+                start = Dimension.Spacing.L.dp,
+                end = Dimension.Spacing.L.dp
+            )
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.illustration_chat_completed),
+            contentDescription = stringResource(R.string.content_description_chat_completed),
+            modifier = Modifier.size(150.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
+        Column(
+            modifier = Modifier.padding(horizontal = Dimension.Spacing.L.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = stringResource(R.string.message_list_chat_completed_title),
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
+            Text(
+                text = stringResource(R.string.message_list_chat_completed_description),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        Spacer(modifier = Modifier.size(Dimension.Spacing.XL.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            TextButton(
+                onClick = onStay,
+            ) {
+                Text(
+                    text = stringResource(R.string.message_list_chat_completed_button_stay),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+
+            Button(
+                onClick = onExplore,
+            ) {
+                Text(
+                    text = stringResource(R.string.message_list_chat_completed_button_explore),
+                    style = MaterialTheme.typography.labelLarge,
+                )
             }
         }
     }
 }
 
 @Composable
-fun MessageOptionItem(
+private fun SendButton(
+    modifier: Modifier = Modifier,
+    enabled: Boolean,
+    onClick: () -> Unit
+){
+    Button(
+        modifier = modifier,
+        enabled = enabled,
+        onClick = onClick,
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_send),
+            contentDescription = stringResource(R.string.content_description_send),
+            modifier = Modifier
+                .size(Dimension.Icon.dp),
+        )
+        Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
+        Text(
+            text = stringResource(R.string.message_list_button_send),
+            style = MaterialTheme.typography.labelLarge,
+        )
+    }
+}
+
+@Composable
+private fun MessageOptionItem(
     messageOption: MessageOption,
     isSelected: Boolean,
     onClick: () -> Unit
@@ -503,7 +604,7 @@ fun MessageOptionItem(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SentMessageItem(
+private fun SentMessageItem(
     modifier: Modifier = Modifier,
     sentMessage: SentMessage,
     isSelected: Boolean,
@@ -537,12 +638,6 @@ fun SentMessageItem(
                 bottomStart = Dimension.CornerRadius.dp
             )
 
-    val calendar = Calendar.getInstance()
-    calendar.timeInMillis = sentMessage.timestamp
-
-    val time = "${calendar.get(Calendar.HOUR_OF_DAY)}:${calendar.get(Calendar.MINUTE)} ${if (calendar.get(
-            Calendar.AM_PM) == Calendar.AM) "AM" else "PM"}"
-
     val haptic = LocalHapticFeedback.current
 
     val selectionColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
@@ -554,11 +649,11 @@ fun SentMessageItem(
                 indication = rememberRipple(color = selectionColor),
                 interactionSource = remember { MutableInteractionSource() },
                 onClick = {
-                    onClick(sentMessage.id)
+                    onClick(sentMessage.messageId)
                 },
                 onLongClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onLongPress(sentMessage.id)
+                    onLongPress(sentMessage.messageId)
                 }
             )
     ) {
@@ -587,7 +682,7 @@ fun SentMessageItem(
             }
             Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
             Text(
-                text = time,
+                text = sentMessage.timestamp.toFormattedTime(),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -600,4 +695,33 @@ fun SentMessageItem(
             )
         }
     }
+}
+
+@Composable
+private fun RollbackDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text(stringResource(R.string.rollback_dialog_title)) },
+        text = { Text(stringResource(R.string.rollback_dialog_description)) },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onConfirm()
+                    onDismiss()
+                }
+            ){
+                Text(stringResource(R.string.rollback_dialog_button_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = { onDismiss() }
+            ){
+                Text(stringResource(R.string.rollback_dialog_button_cancel))
+            }
+        }
+    )
 }

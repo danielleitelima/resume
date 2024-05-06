@@ -53,24 +53,25 @@ class IChatRepository(
                     chatTranslation.languagesCode == targetLanguage.first().code
                 }.title
 
-                val history: List<SentMessage> = chat.messages.split(",").mapNotNull { messageId ->
-                    val message = database.messageQueries.getById(messageId).executeAsOne()
+                val messages = chat.messages.split(",")
+                val chatMessages = chat.relationIds.split(",")
+                val timestamps = chat.timestamps.split(",").mapNotNull { it.toLongOrNull() }
 
-                    val content = database.messageTranslationRelationQueries.getByMessageId(message.id).executeAsList().map { messageTranslationRelation ->
+                val history = messages.zip(chatMessages.zip(timestamps)) { message, pair ->
+                    val content = database.messageTranslationRelationQueries.getByMessageId(message).executeAsList().map { messageTranslationRelation ->
                         database.messageTranslationQueries.getById(messageTranslationRelation.messageTranslationId).executeAsOne()
                     }.first { messageTranslation ->
-                        messageTranslation.languagesCode == targetLanguage.first().code
+                        messageTranslation.languagesCode == getSelectedTargetLanguage().code
                     }.content
 
-                    if (message.timestamp == null)
-                        null
-                    else
-                        SentMessage(
-                            id = message.id,
-                            content = content,
-                            timestamp = message.timestamp,
-                            isUserSent = message.userSent ?: false,
-                        )
+                    val isUserSent = database.messageQueries.getById(message).executeAsOne().userSent
+                    SentMessage(
+                        id = pair.first,
+                        messageId = message,
+                        content = content,
+                        timestamp = pair.second,
+                        isUserSent = isUserSent ?: false,
+                    )
                 }
 
                 OpenChat(
@@ -83,8 +84,8 @@ class IChatRepository(
     }
 
     override fun getOpenChat(chatId: String): Flow<OpenChat> {
-        return database.chatQueries.getByIdWithMessages(chatId).asFlow().mapToList(Dispatchers.IO).map {
-            val chat = it.first()
+        return database.chatQueries.getByIdWithMessages(chatId).asFlow().map {
+            val chat = it.executeAsOne()
 
             val chatTranslationId = database.chatTranslationRelationQueries.getByChatId(chat.id).executeAsList().first { chatTranslationRelation ->
                 val translation = database.chatTranslationQueries.getById(chatTranslationRelation.chatTranslationId).executeAsOne()
@@ -95,30 +96,25 @@ class IChatRepository(
 
             val title = chatTranslation.title
 
-            val messages = if(chat.messages != null) {
-                chat.messages.split(",")
-            } else{
-                emptyList()
-            }
+            val messages = chat.messages.split(",")
+            val chatMessages = chat.relationIds.split(",")
+            val timestamps = chat.timestamps.split(",").mapNotNull { timestamp -> timestamp.toLongOrNull() }
 
-            val history = messages.mapNotNull { messageId ->
-                val message = database.messageQueries.getById(messageId).executeAsOne()
-
-                val content = database.messageTranslationRelationQueries.getByMessageId(message.id).executeAsList().map { messageTranslationRelation ->
+            val history = messages.zip(chatMessages.zip(timestamps)) { message, pair ->
+                val content = database.messageTranslationRelationQueries.getByMessageId(message).executeAsList().map { messageTranslationRelation ->
                     database.messageTranslationQueries.getById(messageTranslationRelation.messageTranslationId).executeAsOne()
                 }.first { messageTranslation ->
                     messageTranslation.languagesCode == getSelectedTargetLanguage().code
                 }.content
 
-                if (message.timestamp == null)
-                    null
-                else
-                    SentMessage(
-                        id = message.id,
-                        content = content,
-                        timestamp = message.timestamp,
-                        isUserSent = message.userSent ?: false,
-                    )
+                val isUserSent = database.messageQueries.getById(message).executeAsOne().userSent
+                SentMessage(
+                    id = pair.first,
+                    messageId = message,
+                    content = content,
+                    timestamp = pair.second,
+                    isUserSent = isUserSent ?: false,
+                )
             }
 
             OpenChat(
@@ -130,16 +126,12 @@ class IChatRepository(
     }
 
     override suspend fun addMessage(chatId: String, messageId: String) {
-        database.messageQueries.updateTimestamp(
-            timestamp = Calendar.getInstance().timeInMillis,
-            id = messageId
-        )
         database.chatMessageRelationQueries.insert(
             chatId = chatId,
             messageId = messageId,
+            timestamp = Calendar.getInstance().timeInMillis
         )
     }
-
 
     override suspend fun deleteMessages(chatId: String, messageIds: List<String>) {
         database.transaction {
@@ -180,7 +172,6 @@ class IChatRepository(
             articles = articles,
             expressions = expressions,
             sections = sections,
-            timestamp = message.timestamp,
             isUserSent = message.userSent ?: false,
             translation = messageTranslationLanguage.content,
         )
@@ -252,7 +243,7 @@ class IChatRepository(
 
     private fun getExample(exampleId: String): Example {
         // TODO: Fix this workaround. Only one item should be returned from this query.
-        val exampleData = database.exampleQueries.getExampleWithTranslations(exampleId).executeAsList().firstOrNull()
+        val exampleData = database.exampleQueries.getExampleWithTranslations(exampleId).executeAsOneOrNull()
             ?: throw Exception("No example found for the given ID or missing translations")
 
         return Example(
@@ -265,7 +256,6 @@ class IChatRepository(
     private fun MessageDetailDataResponse.cache() {
         database.messageQueries.insert(
             id = id,
-            timestamp = null,
             userSent = userSent,
         )
 
@@ -502,7 +492,6 @@ class IChatRepository(
         return MessageDetail(
             id = message.id,
             isUserSent = message.userSent,
-            timestamp = Calendar.getInstance().timeInMillis,
             content = messageTargetLanguage.content,
             articles = articles,
             sections = sections,

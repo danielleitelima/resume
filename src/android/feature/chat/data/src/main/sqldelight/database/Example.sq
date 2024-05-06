@@ -7,11 +7,6 @@ INSERT OR REPLACE
 INTO Example
 VALUES(?);
 
-getById:
-SELECT *
-FROM Example
-WHERE id = :id;
-
 getExampleWithTranslations:
 SELECT et1.id, et1.content AS targetContent, et2.content AS translationContent
 FROM Example e

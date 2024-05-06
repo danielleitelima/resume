@@ -11,8 +11,3 @@ WHERE NOT EXISTS (
     SELECT 1 FROM ArticleTranslationRelation
     WHERE articleId = :articleId AND articleTranslationId = :articleTranslationId
 );
-
-getByArticleId:
-SELECT *
-FROM ArticleTranslationRelation
-WHERE articleId = :articleId;

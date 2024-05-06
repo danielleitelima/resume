@@ -10,13 +10,13 @@ class RollbackToMessage(
 
         val openChat = chatRepository.getOpenChat(chatId).first()
 
-        val selectedMessage = openChat.history.find { it.id == messageId }
+        val selectedMessage = openChat.history.find { it.messageId == messageId }
 
         val messagesToRollback = openChat.history.filter {
             if (selectedMessage == null) return@filter false
             it.timestamp > selectedMessage.timestamp
-        }.map { it.id }.toMutableList().apply {
-            if (selectedMessage?.isUserSent == true) add(selectedMessage.id)
+        }.map { it.messageId }.toMutableList().apply {
+            if (selectedMessage?.isUserSent == true) add(selectedMessage.messageId)
         }
 
         chatRepository.deleteMessages(chatId, messagesToRollback)

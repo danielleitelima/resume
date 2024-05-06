@@ -20,26 +20,29 @@ class GetActiveChat(
 
                 activeChat = ActiveChat(
                     openChat = openChat,
-                    currentMessageOptions = messageOptions
+                    currentMessageOptions = messageOptions,
                 )
 
                 return@map activeChat
             }
 
             if (lastMessage.isUserSent) {
-                val firstReplyDetail = chatRepository.fetchFirstReplyDetail(lastMessage.id)
+                val firstReplyDetail = chatRepository.fetchFirstReplyDetail(lastMessage.messageId)
 
-                chatRepository.addMessage(chatId, firstReplyDetail.id)
+                chatRepository.addMessage(
+                    chatId = chatId,
+                    messageId = firstReplyDetail.id,
+                )
 
                 activeChat = ActiveChat(
                     openChat = openChat,
-                    currentMessageOptions = null
+                    currentMessageOptions = null,
                 )
 
                 return@map activeChat
             }
 
-            val replyOptions = chatRepository.fetchReplyOptions(lastMessage.id)
+            val replyOptions = chatRepository.fetchReplyOptions(lastMessage.messageId)
 
             if (replyOptions.any { it.isUserSent.not() }) {
                 val firstNonUserReply = replyOptions.first { it.isUserSent.not() }
@@ -48,17 +51,17 @@ class GetActiveChat(
 
                 activeChat = ActiveChat(
                     openChat = openChat,
-                    currentMessageOptions = null
+                    currentMessageOptions = null,
                 )
 
                 return@map activeChat
             }
 
-            val messageOptions = chatRepository.fetchReplyOptions(lastMessage.id)
+            val messageOptions = chatRepository.fetchReplyOptions(lastMessage.messageId)
 
             activeChat = ActiveChat(
                 openChat = openChat,
-                currentMessageOptions = messageOptions
+                currentMessageOptions = messageOptions,
             )
 
             return@map activeChat

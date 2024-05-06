@@ -15,6 +15,7 @@ sealed class MessageListContract {
 
     data class State(
         val isLoading: Boolean = true,
+        val isTyping: Boolean = false,
         val openChat: OpenChat? = null,
         val messageOptions: List<MessageOption>? = null
     ) : ViewState

@@ -9,15 +9,6 @@ INSERT OR REPLACE
 INTO Expression
 VALUES(?, ?, ?);
 
-getAll:
-SELECT *
-FROM Expression;
-
-getById:
-SELECT *
-FROM Expression
-WHERE id = :id;
-
 getExpressionWithTranslation:
 SELECT
     e.id, e.content, et.description

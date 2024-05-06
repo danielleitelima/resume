@@ -10,8 +10,3 @@ insert:
 INSERT OR REPLACE
 INTO ArticleTranslation
 VALUES(?, ?, ?, ?, ?);
-
-getById:
-SELECT *
-FROM ArticleTranslation
-WHERE id = :id;

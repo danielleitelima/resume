@@ -11,8 +11,3 @@ WHERE NOT EXISTS (
     SELECT 1 FROM MeaningTranslationRelation
     WHERE meaningId = :meaningId AND meaningTranslationId = :meaningTranslationId
 );
-
-getByMeaningId:
-SELECT *
-FROM MeaningTranslationRelation
-WHERE meaningId = :meaningId;

@@ -4,6 +4,6 @@ import com.danielleitelima.resume.home.data.datasource.remote.dto.ResumeDTO
 import retrofit2.http.GET
 
 interface ResumeAPI {
-    @GET("database.json")
+    @GET("main.json")
     suspend fun getResume(): ResumeDTO
 }

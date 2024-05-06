@@ -18,8 +18,6 @@ class GetInitialData(
             InitialData(
                 targetsLanguages = targetLanguages,
                 translationLanguages = translationLanguages,
-
-                // TODO: Find a way to update the chats also when the languages are updated
                 chats = chats
             )
         }.onStart {

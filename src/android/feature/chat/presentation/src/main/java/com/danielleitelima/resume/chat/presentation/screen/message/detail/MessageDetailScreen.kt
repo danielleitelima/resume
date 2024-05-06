@@ -28,12 +28,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,7 +56,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavBackStackEntry
+import com.danielleitelima.resume.chat.domain.Article
+import com.danielleitelima.resume.chat.domain.Example
 import com.danielleitelima.resume.chat.domain.Expression
+import com.danielleitelima.resume.chat.domain.HighlightedRange
+import com.danielleitelima.resume.chat.domain.Meaning
+import com.danielleitelima.resume.chat.domain.MessageDetail
+import com.danielleitelima.resume.chat.domain.Section
 import com.danielleitelima.resume.chat.presentation.R
 import com.danielleitelima.resume.chat.presentation.screen.component.ArticleItem
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
@@ -78,42 +86,31 @@ object MessageDetailScreen : Screen {
     override val route: Route
         get() = MessageDetailRoute
 
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content(backStackEntry: NavBackStackEntry) {
-        val viewModel: MessageDetailViewModel = rememberViewModel { getKoinInstance() }
-        val state by viewModel.state.collectAsState()
+        val navController = LocalNavHostController.current
         val messageId = MessageDetailRoute.getMessageId(backStackEntry)
 
+        val viewModel: MessageDetailViewModel = rememberViewModel { getKoinInstance() }
+        val state by viewModel.state.collectAsState()
+
         val textToSpeechManager: TextToSpeechManager = remember { getKoinInstance() }
+        var selectedSection by remember { mutableStateOf<String?>(null) }
+        val bottomSheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true
+        )
+        val isMessagePlaying = remember { mutableStateOf(false) }
+        val isSectionPlaying = remember { mutableStateOf(false) }
+
+        val messageDetail = state.messageDetail
+        val highlightSections = messageDetail?.getHighlightedRanges()
 
         LaunchedEffect(messageId) {
             if (messageId != null){
                 viewModel.setEvent(MessageDetailContract.Event.LoadMessageDetail(messageId))
             }
         }
-
-        val navController = LocalNavHostController.current
-
-        var selectedSection by remember { mutableStateOf<String?>(null) }
-        val bottomSheetState = rememberModalBottomSheetState(
-            skipPartiallyExpanded = true
-        )
-        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-        val messageDetail = state.messageDetail
-
-        val expressionPagerState = rememberPagerState(pageCount = { messageDetail?.expressions?.size ?: 0})
-        val relatedArticlePagerState = rememberPagerState(pageCount = { messageDetail?.articles?.size ?: 0})
-
-        val onRelatedArticleClick: (String) -> Unit = {
-            navController.navigate(ArticleDetail.routeWithArguments(it))
-        }
-
-        val highlightSections = messageDetail?.getHighlightedRanges()
-
-        val isMessagePlaying = remember { mutableStateOf(false) }
-        val isSectionPlaying = remember { mutableStateOf(false) }
 
         Scaffold(
             topBar = {
@@ -122,32 +119,10 @@ object MessageDetailScreen : Screen {
                         Text(stringResource(R.string.message_detail_title))
                     },
                     actions = {
-                        IconButton(onClick = {
-                            if (isMessagePlaying.value) {
-                                textToSpeechManager.stopSpeaking()
-                                isMessagePlaying.value = false
-                            } else {
-                                textToSpeechManager.startSpeaking(
-                                    messageDetail?.content.orEmpty()
-                                ){
-                                    isMessagePlaying.value = false
-                                }
-                                isMessagePlaying.value = true
-                            }
-                        }) {
-                            val icon = if (isMessagePlaying.value) {
-                                R.drawable.ic_stop
-                            } else {
-                                R.drawable.ic_volume_up
-                            }
-
-                            Icon(
-                                painter = painterResource(id = icon),
-                                contentDescription = stringResource(R.string.content_description_volume_up),
-                                modifier = Modifier.size(Dimension.Icon.dp),
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
+                        TextToSpeechButton(
+                            text = messageDetail?.content.orEmpty(),
+                            isPlaying = isMessagePlaying
+                        )
                     },
                     navigationIcon = {
                         IconButton(onClick = {
@@ -164,13 +139,11 @@ object MessageDetailScreen : Screen {
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     ),
-                    scrollBehavior = scrollBehavior,
+                    scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
                 )
             },
             content = {
-                if (messageDetail == null) {
-                    return@Scaffold
-                }
+                if (messageDetail == null) return@Scaffold
 
                 Column(
                     modifier = Modifier
@@ -180,270 +153,342 @@ object MessageDetailScreen : Screen {
                     horizontalAlignment = Alignment.Start,
                 ) {
                     Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = Dimension.Spacing.L.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        ExtendedSpansText(
-                            text = buildAnnotatedString {
-                                append(messageDetail.content)
-                                highlightSections?.forEach { highlight ->
-                                    addStyle(
-                                        style = SpanStyle(
-                                            textDecoration = TextDecoration.Underline,
-                                            color = if (highlight.sectionId == selectedSection) {
-                                                MaterialTheme.colorScheme.primary
-                                            } else {
-                                                MaterialTheme.colorScheme.secondary
-                                            }
-                                        ),
-                                        start = highlight.start,
-                                        end = highlight.end
-                                    )
-                                }
-                            },
-                            onClick = {
-                                val clickedEntry = highlightSections?.find { section ->
-                                    section.start <= it.toInt() && section.end >= it.toInt()
-                                }
 
-                                val clickedSection = messageDetail.sections.find { section ->
-                                    section.id == clickedEntry?.sectionId
-                                }
-
-                                clickedSection?.let { section ->
-                                    selectedSection = section.id
-                                }
+                    ContentSection(
+                        messageDetail = messageDetail,
+                        highlightSections = highlightSections.orEmpty(),
+                        onSectionSelected = {
+                            val clickedEntry = highlightSections?.find { section ->
+                                section.start <= it.toInt() && section.end >= it.toInt()
                             }
-                        )
-                        Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
-                        Text(
-                            text = messageDetail.translation,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+
+                            val clickedSection = messageDetail.sections.find { section ->
+                                section.id == clickedEntry?.sectionId
+                            }
+
+                            clickedSection?.let { section ->
+                                selectedSection = section.id
+                            }
+                        }
+                    )
+
                     Spacer(modifier = Modifier.size(Dimension.Spacing.XL.dp))
-                    Text(
-                        text = stringResource(R.string.message_detail_section_expression_label),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = Dimension.Spacing.L.dp)
+
+                    ExpressionSection(
+                        expressions = messageDetail.expressions,
+                        onSeeMoreClick = {
+                            navController.navigate(ExpressionList.routeWithArguments(messageId.orEmpty()))
+                        }
                     )
-                    Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
 
-                    HorizontalPager(state = expressionPagerState,
-                        contentPadding = PaddingValues(horizontal = Dimension.Spacing.L.dp),
-                        pageSpacing = Dimension.Spacing.S.dp
-                    ) {position ->
-                        val expression = messageDetail.expressions[position]
-                        ExpressionItem(
-                            expression = expression,
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
-                    SeeMoreButton(
-                        modifier = Modifier
-                            .align(Alignment.End)
-                            .padding(end = Dimension.Spacing.L.dp),
-                    ){
-                        navController.navigate(
-                            ExpressionList.routeWithArguments(
-                                messageId = messageId.orEmpty()
+                    ArticleSection(
+                        articles = messageDetail.articles,
+                        onArticleClick = { articleId ->
+                            navController.navigate(ArticleDetail.routeWithArguments(articleId))
+                        },
+                        onSeeMoreClick = {
+                            navController.navigate(
+                                ArticleList.routeWithArguments(
+                                    messageId = messageId.orEmpty()
+                                )
                             )
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.size(Dimension.Spacing.M.dp))
-                    Text(
-                        text = stringResource(R.string.message_detail_section_article_label),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = Dimension.Spacing.L.dp)
+                        }
                     )
-                    Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
-
-                    HorizontalPager(
-                        state = relatedArticlePagerState,
-                        contentPadding = PaddingValues(horizontal = Dimension.Spacing.L.dp),
-                        pageSpacing = Dimension.Spacing.S.dp,
-                    ) {position ->
-                        val article = messageDetail.articles[position]
-
-                        val configuration = LocalConfiguration.current
-                        val width = configuration.screenWidthDp.dp - (48.dp)
-
-                        ArticleItem(
-                            modifier = Modifier.width(width),
-                            article = article,
-                            onClick = onRelatedArticleClick,
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
-                    SeeMoreButton(
-                        modifier = Modifier
-                            .align(Alignment.End)
-                            .padding(end = Dimension.Spacing.L.dp),
-                    ){
-                        navController.navigate(
-                            ArticleList.routeWithArguments(
-                                messageId = messageId.orEmpty()
-                            )
-                        )
-                    }
                 }
             },
         )
 
         if (selectedSection != null) {
-            val section = messageDetail?.sections?.find { it.id == selectedSection }
+            val section = messageDetail?.sections?.find { it.id == selectedSection } ?: return
             textToSpeechManager.stopSpeaking()
             isMessagePlaying.value = false
-            isSectionPlaying.value = false
 
-            ModalBottomSheet(
-                onDismissRequest = {
-                    selectedSection = null
-                    textToSpeechManager.stopSpeaking()
-                    isMessagePlaying.value = false
-                    isSectionPlaying.value = false
-                },
-                sheetState = bottomSheetState,
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = Dimension.Spacing.L.dp),
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = section?.content.orEmpty(),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Spacer(modifier = Modifier.width(Dimension.Spacing.XS.dp))
-                        IconButton(onClick = {
-                            if (isSectionPlaying.value) {
-                                textToSpeechManager.stopSpeaking()
-                                isSectionPlaying.value = false
-                            } else {
-                                textToSpeechManager.startSpeaking(
-                                    section?.content.orEmpty()
-                                ){
-                                    isSectionPlaying.value = false
-                                }
-                                isSectionPlaying.value = true
-                            }
-                        }) {
-                            val icon = if (isSectionPlaying.value) {
-                                R.drawable.ic_stop
-                            } else {
-                                R.drawable.ic_volume_up
-                            }
-                            Icon(
-                                painter = painterResource(id = icon),
-                                contentDescription = stringResource(R.string.content_description_volume_up),
-                                modifier = Modifier.size(Dimension.Spacing.L.dp),
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
-
-                    val mainMeaning = section?.meanings?.first { it.main }
-
-                    Text(
-                        text = mainMeaning?.translation.orEmpty(),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
-
-                    mainMeaning?.examples?.forEach { example ->
-                        Text(
-                            text = example.content,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
-                    }
-
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
-
-                    val otherMeanings = section?.meanings?.filter { it.main.not() }
-
-                    if (otherMeanings.isNullOrEmpty()) {
-                        return@Column
-                    }
-
-                    HorizontalDivider()
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(R.string.message_detail_section_label_other_meaning),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Center,
-                    )
-
-                    otherMeanings.forEach { otherMeaning ->
-                        Text(
-                            text = otherMeaning.translation,
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
-                        otherMeaning.examples.forEach { example ->
-                            Text(
-                                text = example.content,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.XXL.dp))
-                }
+            SectionModal(bottomSheetState = bottomSheetState, section = section, isPlaying = isSectionPlaying){
+                selectedSection = null
+                textToSpeechManager.stopSpeaking()
+                isSectionPlaying.value = false
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpressionItem(
+private fun SectionModal(
     modifier: Modifier = Modifier,
-    expression: Expression
+    bottomSheetState: SheetState,
+    section: Section,
+    isPlaying: MutableState<Boolean>,
+    onDismiss: () -> Unit = {},
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = bottomSheetState,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = Dimension.Spacing.L.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = section.content,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(modifier = Modifier.width(Dimension.Spacing.XS.dp))
+                TextToSpeechButton(
+                    text = section.content,
+                    isPlaying = isPlaying
+                )
+            }
+            Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+
+            val mainMeaning = section.meanings.firstOrNull { it.main }
+            MeaningItem(meaning = mainMeaning)
+            Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+
+            val otherMeanings = section.meanings.filter { it.main.not() }
+            if (otherMeanings.isEmpty()) {
+                return@Column
+            }
+
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+            MeaningList(meanings = otherMeanings)
+            Spacer(modifier = Modifier.height(Dimension.Spacing.XXL.dp))
+        }
+    }
+}
+
+@Composable
+private fun ContentSection(
+    modifier: Modifier = Modifier,
+    onSectionSelected: (String) -> Unit = {},
+    messageDetail: MessageDetail,
+    highlightSections: List<HighlightedRange>
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = Dimension.Spacing.L.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        ExtendedSpansText(
+            text = buildAnnotatedString {
+                append(messageDetail.content)
+                highlightSections.forEach { highlight ->
+                    addStyle(
+                        style = SpanStyle(
+                            textDecoration = TextDecoration.Underline,
+                            color = MaterialTheme.colorScheme.primary
+                        ),
+                        start = highlight.start,
+                        end = highlight.end
+                    )
+                }
+            },
+            onClick = onSectionSelected
+        )
+        Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
+        Text(
+            text = messageDetail.translation,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ExpressionSection(
+    modifier: Modifier = Modifier,
+    expressions: List<Expression>,
+    onSeeMoreClick: () -> Unit = {},
 ) {
     val configuration = LocalConfiguration.current
 
-    // TODO: Optimize this logic
-    val width = configuration.screenWidthDp.dp - (48.dp)
+    Column(
+        modifier = modifier
+    ) {
+        if (expressions.isNotEmpty()){
+            Text(
+                text = stringResource(R.string.message_detail_section_expression_label),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Dimension.Spacing.L.dp)
+            )
+            Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
 
-    val exampleCountText = if (expression.examples.size == 1) {
-        "${expression.examples.size} example"
-    } else {
-        "${expression.examples.size} examples"
+            HorizontalPager(
+                state = rememberPagerState(
+                    pageCount = { expressions.size }
+                ),
+                contentPadding = PaddingValues(horizontal = Dimension.Spacing.L.dp),
+                pageSpacing = Dimension.Spacing.S.dp
+            ) {position ->
+                val expression = expressions[position]
+                val width = configuration.screenWidthDp.dp - (Dimension.Spacing.L.dp * 2)
+
+                ExpressionItem(
+                    modifier = Modifier.width(width),
+                    expression = expression,
+                )
+            }
+
+            Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
+
+            SeeMoreButton(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(end = Dimension.Spacing.L.dp),
+                onClick = onSeeMoreClick
+            )
+
+            Spacer(modifier = Modifier.size(Dimension.Spacing.M.dp))
+        }
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ArticleSection(
+    modifier: Modifier = Modifier,
+    articles: List<Article>,
+    onArticleClick: (String) -> Unit = {},
+    onSeeMoreClick: () -> Unit = {},
+) {
+    val configuration = LocalConfiguration.current
 
     Column(
         modifier = modifier
-            .width(width)
+    ) {
+        if (articles.isNotEmpty()){
+            Text(
+                text = stringResource(R.string.message_detail_section_article_label),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Dimension.Spacing.L.dp)
+            )
+            Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
+
+            HorizontalPager(
+                state = rememberPagerState(pageCount = { articles.size}),
+                contentPadding = PaddingValues(horizontal = Dimension.Spacing.L.dp),
+                pageSpacing = Dimension.Spacing.S.dp,
+            ) {position ->
+                val article = articles[position]
+                val width = configuration.screenWidthDp.dp - (Dimension.Spacing.L.dp * 2)
+
+                ArticleItem(
+                    modifier = Modifier.width(width),
+                    article = article,
+                    onClick = onArticleClick,
+                )
+            }
+
+            Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
+            SeeMoreButton(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(end = Dimension.Spacing.L.dp),
+                onClick = onSeeMoreClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun MeaningList(
+    modifier: Modifier = Modifier,
+    meanings: List<Meaning>
+){
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(R.string.message_detail_section_label_other_meaning),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(Dimension.Spacing.S.dp))
+        meanings.forEach { meaning ->
+            MeaningItem(
+                meaning = meaning
+            )
+            Spacer(modifier = Modifier.height(Dimension.Spacing.S.dp))
+        }
+    }
+}
+
+@Composable
+private fun MeaningItem(
+    modifier: Modifier = Modifier,
+    meaning: Meaning?
+) {
+    if (meaning == null) return
+
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text = meaning.translation,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
+        ExampleList(examples = meaning.examples)
+    }
+}
+
+@Composable
+private fun ExampleList(
+    modifier: Modifier = Modifier,
+    examples: List<Example>,
+) {
+    Column(
+        modifier = modifier
+    ) {
+        examples.forEach{ example ->
+            Text(
+                text = example.content,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
+        }
+    }
+}
+
+@Composable
+private fun ExpressionItem(
+    modifier: Modifier = Modifier,
+    expression: Expression
+) {
+    val exampleCountRes = if (expression.examples.size == 1) {
+        R.string.expression_example_count_single
+    } else {
+        R.string.expression_example_count_multiple
+    }
+
+    val exampleCount = stringResource(id = exampleCountRes, expression.examples.size)
+
+    Column(
+        modifier = modifier
             .height(140.dp)
             .clip(RoundedCornerShape(Dimension.CornerRadius.dp))
             .background(MaterialTheme.colorScheme.surfaceContainerHighest)
@@ -470,7 +515,7 @@ fun ExpressionItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.End),
-            text = exampleCountText,
+            text = exampleCount,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.End,
@@ -533,6 +578,41 @@ private fun SeeMoreButton(
             text = stringResource(R.string.message_detail_button_see_more),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary,
+        )
+    }
+}
+@Composable
+private fun TextToSpeechButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    isPlaying: MutableState<Boolean>
+) {
+    val textToSpeechManager: TextToSpeechManager = remember { getKoinInstance() }
+
+    LaunchedEffect(isPlaying.value) {
+        if (isPlaying.value) {
+            textToSpeechManager.startSpeaking(text) {
+                isPlaying.value = false
+            }
+        } else {
+            textToSpeechManager.stopSpeaking()
+        }
+    }
+
+    IconButton(
+        modifier = modifier,
+        onClick = { isPlaying.value = isPlaying.value.not() }
+    ) {
+        val icon = if (isPlaying.value) {
+            R.drawable.ic_stop
+        } else {
+            R.drawable.ic_volume_up
+        }
+        Icon(
+            painter = painterResource(id = icon),
+            contentDescription = stringResource(R.string.content_description_volume_up),
+            modifier = Modifier.size(Dimension.Icon.dp),
+            tint = MaterialTheme.colorScheme.onSurface
         )
     }
 }

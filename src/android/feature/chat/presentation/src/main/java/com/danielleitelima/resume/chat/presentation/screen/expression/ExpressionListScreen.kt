@@ -154,7 +154,6 @@ fun ExpressionItem(
 @Composable
 fun ExampleItem(
     modifier: Modifier = Modifier,
-    maxLines: Int = Int.MAX_VALUE,
     example: Example,
     number: Int
 ) {
@@ -166,7 +165,6 @@ fun ExampleItem(
             text = "$number.",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
-            maxLines = maxLines,
         )
         Spacer(modifier = Modifier.size(Dimension.Spacing.XXS.dp))
         Column {
@@ -174,7 +172,6 @@ fun ExampleItem(
                 text = example.content,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                maxLines = maxLines,
             )
             Spacer(modifier = Modifier.size(Dimension.Spacing.XXS.dp))
 
@@ -182,7 +179,6 @@ fun ExampleItem(
                 text = example.translation,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = maxLines,
             )
         }
     }
