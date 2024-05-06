@@ -1,0 +1,13 @@
+CREATE TABLE ExampleTranslationRelation (
+    id INTEGER PRIMARY KEY AUTOINCREMENT ,
+    exampleId TEXT NOT NULL,
+    exampleTranslationId TEXT NOT NULL
+);
+
+insert:
+INSERT INTO ExampleTranslationRelation (exampleId, exampleTranslationId)
+SELECT :exampleId, :exampleTranslationId
+WHERE NOT EXISTS (
+    SELECT 1 FROM ExampleTranslationRelation
+    WHERE exampleId = :exampleId AND exampleTranslationId = :exampleTranslationId
+);

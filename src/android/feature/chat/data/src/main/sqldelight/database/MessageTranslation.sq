@@ -1,0 +1,15 @@
+CREATE TABLE MessageTranslation (
+    id TEXT PRIMARY KEY NOT NULL,
+    content TEXT NOT NULL,
+    languagesCode TEXT NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO MessageTranslation
+VALUES(?, ?, ?);
+
+getById:
+SELECT *
+FROM MessageTranslation
+WHERE id = :id;

@@ -4,11 +4,13 @@
     <string name="content_description_info">Info</string>
     <string name="content_description_back">Back</string>
     <string name="content_description_chatting">Chatting Illustration</string>
+    <string name="content_description_chat_completed">Chat completed</string>
+
     <string name="home_title">Start your adventure</string>
     <string name="home_description">Step into your first chat and discover, learn, and grow as every message unfolds a new path in your language learning journey. Ready for the challenge?</string>
     <string name="content_description_create_chat">Create chat</string>
     <string name="home_overlay_content">This sample demonstrates a game-based approach to language learning, facilitated by a straightforward user interface and AI-generated content. Users can initiate a conversation with a selection of Bot characters and advance the interaction by choosing from an array of pre-defined message options. Should a message or its response from the Bot seem unclear, there\'s an option to analyse it, for a comprehensive breakdown of its meaning. Additionally, users have the flexibility to delete entire chat histories to restart the assisted conversations or simply return to point of a specific message.</string>
-    <string name="creation_title">New message</string>
+    <string name="creation_title">New chat</string>
     <string name="content_description_back_or_close">Back or Close</string>
     <string name="message_list_alert_content_copy">Message copied</string>
     <string name="content_description_copy">Copy</string>
@@ -20,6 +22,10 @@
     <string name="content_description_send">Send</string>
     <string name="message_list_label_option">View message options</string>
     <string name="message_list_button_send">Send</string>
+    <string name="message_list_chat_completed_title">Chat completed</string>
+    <string name="message_list_chat_completed_description">This conversation reached it\'s end for the moment, but you can continue your journey exploring other chats.</string>
+    <string name="message_list_chat_completed_button_stay">Stay here</string>
+    <string name="message_list_chat_completed_button_explore">Explore</string>
     <string name="message_detail_title">Analysis</string>
     <string name="content_description_volume_up">Text to speech</string>
     <string name="message_detail_section_expression_label">Common expressions</string>
@@ -29,4 +35,17 @@
     <string name="message_detail_button_see_more">See more</string>
     <string name="expression_list_title">Common expressions</string>
     <string name="article_list_title">Related articles</string>
+    <string name="article_date_recently">Just now</string>
+    <string name="article_date_hours_ago">%1$s hours ago</string>
+    <string name="article_date_days_ago">%1$s days ago</string>
+    <string name="expression_example_count_multiple">%1$s examples</string>
+    <string name="expression_example_count_single">%1$s example</string>
+    <string name="rollback_dialog_title">Rollback</string>
+    <string name="rollback_dialog_description">Are you sure you want to rollback this message?</string>
+    <string name="rollback_dialog_button_confirm">Confirm</string>
+    <string name="rollback_dialog_button_cancel">Cancel</string>
+    <string name="language_selection_dialog_target_description">Your chat messages will be written in:</string>
+    <string name="language_selection_dialog_translation_description">Your translations will be in:</string>
+    <string name="language_selection_dialog_button_confirm">Confirm</string>
+
 </resources>

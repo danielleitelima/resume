@@ -1,0 +1,12 @@
+CREATE TABLE ArticleTranslation (
+    id TEXT PRIMARY KEY NOT NULL,
+    title TEXT NOT NULL,
+    teaser TEXT NOT NULL,
+    content TEXT NOT NULL,
+    languagesCode TEXT NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO ArticleTranslation
+VALUES(?, ?, ?, ?, ?);

@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
@@ -24,6 +25,7 @@ import com.danielleitelima.resume.foundation.presentation.foundation.getKoinInst
 import com.danielleitelima.resume.foundation.presentation.foundation.navigate
 import com.danielleitelima.resume.foundation.presentation.foundation.rememberViewModel
 import com.danielleitelima.resume.foundation.presentation.route.home.Home
+import com.danielleitelima.resume.home.presentation.R
 import com.danielleitelima.resume.home.presentation.screen.home.component.CodeSample
 import com.danielleitelima.resume.home.presentation.screen.home.component.CodeSampleSection
 import com.danielleitelima.resume.home.presentation.screen.home.component.Footer
@@ -70,10 +72,10 @@ object HomeScreen : Screen {
 
                     val codeSamples = listOf(
                         CodeSample(
-                            title = "Assisted chatting",
-                            description = "A method for learning languages through simulated chats.",
+                            title = stringResource(R.string.code_sample_assisted_chatting_title),
+                            description = stringResource(R.string.code_sample_assisted_chatting_description),
                             imageUrl = CODE_SAMPLE_PLACEHOLDER_URL,
-                            tag = null,
+                            tag = stringResource(R.string.code_sample_assisted_chatting_tag),
                             onClick = {
                                 navController.navigate(ChatHome)
                             }

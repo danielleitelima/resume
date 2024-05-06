@@ -58,7 +58,6 @@ dependencies {
     implementation(libs.extendedspans)
     implementation(libs.animation.graphics)
 
-
     implementation(project(":feature:chat:domain"))
     implementation(project(":foundation:presentation"))
     implementation(project(":foundation:domain"))

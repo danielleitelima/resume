@@ -1,0 +1,18 @@
+CREATE TABLE ChatTranslationRelation (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    chatId TEXT NOT NULL,
+    chatTranslationId TEXT NOT NULL
+);
+
+insert:
+INSERT INTO ChatTranslationRelation (chatId, chatTranslationId)
+SELECT :chatId, :chatTranslationId
+WHERE NOT EXISTS (
+    SELECT 1 FROM ChatTranslationRelation
+    WHERE chatId = :chatId AND chatTranslationId = :chatTranslationId
+);
+
+getByChatId:
+SELECT *
+FROM ChatTranslationRelation
+WHERE chatId = :chatId;

@@ -1,18 +1,13 @@
 package com.danielleitelima.resume.chat.presentation.screen.article.list
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,15 +22,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
-import com.danielleitelima.resume.chat.domain.RelatedArticle
 import com.danielleitelima.resume.chat.presentation.R
+import com.danielleitelima.resume.chat.presentation.screen.component.ArticleItem
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
 import com.danielleitelima.resume.foundation.presentation.foundation.Route
 import com.danielleitelima.resume.foundation.presentation.foundation.Screen
@@ -102,11 +93,11 @@ object ArticleListScreen : Screen {
                 ) {
                     Spacer(modifier = Modifier.size(Dimension.Spacing.L.dp))
 
-                    state.relatedArticles.forEach { relatedArticle ->
-                        RelatedArticleItem(
-                            relatedArticle = relatedArticle
+                    state.articles.forEach { article ->
+                        ArticleItem(
+                            article = article
                         ){
-                            navController.navigate(ArticleDetail.routeWithArguments(relatedArticle.id))
+                            navController.navigate(ArticleDetail.routeWithArguments(article.id))
                         }
                         Spacer(modifier = Modifier.height(Dimension.Spacing.S.dp))
                     }
@@ -114,62 +105,5 @@ object ArticleListScreen : Screen {
                 }
             },
         )
-    }
-
-    @Composable
-    fun RelatedArticleItem(
-        modifier: Modifier = Modifier,
-        relatedArticle: RelatedArticle,
-        onClick: () -> Unit = {},
-    ) {
-        Card(
-            modifier = modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(Dimension.CornerRadius.dp))
-                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                .height(140.dp),
-            shape = RoundedCornerShape(Dimension.CornerRadius.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = Dimension.Elevation.dp,
-            ),
-            onClick = onClick,
-        ) {
-            Column(
-                modifier = Modifier.padding(Dimension.Spacing.M.dp),
-            ) {
-                Text(
-                    text = relatedArticle.title,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Spacer(modifier = Modifier.size(Dimension.Spacing.XS.dp))
-                Text(
-                    text = relatedArticle.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Spacer(modifier = Modifier.weight(1.0f))
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.End),
-                    text = stringResource(
-                        R.string.message_detail_read_time,
-                        relatedArticle.date,
-                        relatedArticle.readTime
-                    ),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.End,
-                )
-            }
-        }
     }
 }

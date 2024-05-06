@@ -1,20 +1,25 @@
 package com.danielleitelima.resume.chat.presentation.screen.home
 
 import androidx.lifecycle.viewModelScope
-import com.danielleitelima.resume.chat.domain.usecase.GetAllActiveChat
+import com.danielleitelima.resume.chat.domain.SelectedLanguages
+import com.danielleitelima.resume.chat.domain.usecase.GetInitialData
+import com.danielleitelima.resume.chat.domain.usecase.SetSelectedLanguages
 import kotlinx.coroutines.launch
 
 class IHomeViewModel(
-    private val getAllActiveChat: GetAllActiveChat,
+    private val getInitialData: GetInitialData,
+    private val setSelectedLanguages: SetSelectedLanguages
 ) : HomeViewModel() {
 
     init {
         viewModelScope.launch {
-            getAllActiveChat().collect{
+            getInitialData().collect {
                 setState {
                     copy(
                         isLoading = false,
-                        activeChats = it
+                        chats = it.chats,
+                        targetLanguages = it.targetsLanguages,
+                        translationLanguages = it.translationLanguages,
                     )
                 }
             }
@@ -28,5 +33,17 @@ class IHomeViewModel(
     }
 
     override fun handleEvents(event: HomeContract.Event) {
+        when (event) {
+            is HomeContract.Event.OnLanguagesSelected -> {
+                viewModelScope.launch {
+                    setSelectedLanguages(
+                        SelectedLanguages(
+                            target = event.target,
+                            translation = event.translation
+                        )
+                    )
+                }
+            }
+        }
     }
 }

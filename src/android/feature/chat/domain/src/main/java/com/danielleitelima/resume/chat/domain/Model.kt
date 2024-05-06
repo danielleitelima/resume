@@ -1,46 +1,61 @@
 package com.danielleitelima.resume.chat.domain
 
-data class Chat(
-    val id: String,
-    val title: String,
-    val initialMessageOptions: List<MessageOption>,
-    val history: List<MessageDetail>,
+data class SelectedLanguages(
+    val target: Language,
+    val translation: Language,
 )
 
-data class AvailableChat(
-    val id: String,
-    val title: String,
-    val hasHistory: Boolean
+data class InitialData(
+    val targetsLanguages: List<Language>,
+    val translationLanguages: List<Language>,
+    val chats: List<OpenChat>,
+)
+
+data class Language(
+    val code: String,
+    val name: String,
+    val flagUrl: String,
+    val selected: Boolean,
 )
 
 data class ActiveChat(
-    val id: String,
-    val title: String,
-    val lastSentMessage: SentMessage?,
+    val openChat: OpenChat,
+    val currentMessageOptions: List<MessageOption>? = null,
 )
 
-data class MessageOption(
+data class Chat(
     val id: String,
-    val content: String
+    val title: String,
+)
+
+data class OpenChat(
+    val id: String,
+    val title: String,
+    val history: List<SentMessage>,
 )
 
 data class SentMessage(
     val id: String,
-    val content: String,
+    val messageId: String,
     val isUserSent: Boolean,
-    val timestamp: Long
+    val timestamp: Long,
+    val content: String
+)
+
+data class MessageOption(
+    val id: String,
+    val isUserSent: Boolean,
+    val content: String
 )
 
 data class MessageDetail(
     val id : String,
-    val timestamp: Long,
     val isUserSent: Boolean,
-    val content: String,
     val translation: String,
+    val content: String,
     val sections: List<Section>,
     val expressions: List<Expression>,
-    val relatedArticles: List<RelatedArticle>,
-    val replyOptionsIds: List<String>,
+    val articles: List<Article>,
 ){
     fun getHighlightedRanges(): List<HighlightedRange> {
         val highlightedRanges = mutableListOf<HighlightedRange>()
@@ -70,10 +85,9 @@ data class MessageDetail(
 
 data class Section(
     val id: String,
-    val position: Int,
     val content: String,
-    val meaning: Meaning,
-    val otherMeanings: List<Meaning>
+    val position: Int,
+    val meanings: List<Meaning>
 )
 
 data class HighlightedRange(
@@ -82,19 +96,18 @@ data class HighlightedRange(
     val end: Int
 )
 
-data class RelatedArticle(
-    val id: String,
-    val title: String,
-    val description: String,
-    val date: String,
-    val readTime: String,
-    val content: String
-)
-
 data class Meaning(
     val id: String,
+    val main: Boolean,
     val content: String,
+    val translation: String,
     val examples: List<Example>
+)
+
+data class Example(
+    val id: String,
+    val content: String,
+    val translation: String
 )
 
 data class Expression(
@@ -104,8 +117,15 @@ data class Expression(
     val examples: List<Example>
 )
 
-data class Example(
-    val id : String,
-    val content: String,
-    val translation: String
-)
+data class Article(
+    val id: String,
+    val dateCreated: Long,
+    val dateUpdated: Long?,
+    val readTime: Int,
+    val title: String,
+    val teaser: String,
+    val content: String
+){
+    val lastUpdate: Long
+        get() = dateUpdated ?: dateCreated
+}

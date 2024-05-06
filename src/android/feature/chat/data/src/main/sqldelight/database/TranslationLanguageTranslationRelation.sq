@@ -1,0 +1,19 @@
+CREATE TABLE TranslationLanguageTranslationRelation (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    translationLanguageId TEXT NOT NULL,
+    translationLanguageTranslationId INTEGER NOT NULL,
+    FOREIGN KEY (translationLanguageId) REFERENCES TranslationLanguage(id) ON DELETE CASCADE,
+    FOREIGN KEY (translationLanguageTranslationId) REFERENCES TranslationLanguageTranslation(id) ON DELETE CASCADE
+);
+
+insert:
+INSERT INTO TranslationLanguageTranslationRelation (translationLanguageId, translationLanguageTranslationId)
+SELECT :translationLanguageId, :translationLanguageTranslationId
+WHERE NOT EXISTS (
+    SELECT 1 FROM TranslationLanguageTranslationRelation
+    WHERE translationLanguageId = :translationLanguageId AND translationLanguageTranslationId = :translationLanguageTranslationId
+);
+
+deleteAll:
+DELETE
+FROM TranslationLanguageTranslationRelation;

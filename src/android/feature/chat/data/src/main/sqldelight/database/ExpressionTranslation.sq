@@ -1,0 +1,10 @@
+CREATE TABLE ExpressionTranslation (
+    id TEXT PRIMARY KEY NOT NULL,
+    description TEXT NOT NULL,
+    languagesCode TEXT NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO ExpressionTranslation
+VALUES(?, ?, ?);

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -38,42 +37,42 @@ fun CodeSampleItem(
     Card(
         modifier = modifier
             .height(210.dp)
-            .width(160.dp)
-            .clickable { onClick() },
+            .width(160.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
-        )
+        ),
+        onClick = onClick
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current).data(imageUrl).build(),
-                contentDescription = "Sample image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(125.dp)
-            )
 
-            if (tag != null) {
-                Badge(
-                    text = tag,
+        Column {
+            Box {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current).data(imageUrl).build(),
+                    contentDescription = "Sample image",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp)
+                        .fillMaxWidth()
+                        .height(125.dp)
                 )
+
+                if (tag != null) {
+                    Badge(
+                        text = tag,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                    )
+                }
             }
 
             Column(
                 verticalArrangement = Arrangement.Top,
                 modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 10.dp)
+                    .padding(12.dp)
             ) {
                 Text(
                     maxLines = 1,
@@ -82,7 +81,7 @@ fun CodeSampleItem(
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,

@@ -6,4 +6,7 @@
     <string name="home_footer_title">Let\'s talk!</string>
     <string name="personal_email_address">limaleite.daniel@gmail.com</string>
     <string name="personal_linkedin_url">https://www.linkedin.com/in/danielleitelima/</string>
+    <string name="code_sample_assisted_chatting_title">Assisted chatting</string>
+    <string name="code_sample_assisted_chatting_description">Simulated chats for language learning.</string>
+    <string name="code_sample_assisted_chatting_tag">🔥 New</string>
 </resources>

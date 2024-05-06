@@ -1,0 +1,14 @@
+CREATE TABLE TargetLanguageTranslation (
+    id INTEGER PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    languagesCode TEXT NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO TargetLanguageTranslation
+VALUES(?, ?, ?);
+
+deleteAll:
+DELETE
+FROM TargetLanguageTranslation;

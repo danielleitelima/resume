@@ -7,8 +7,6 @@ class GetMessageDetail(
     private val chatRepository: ChatRepository
 ) {
     suspend operator fun invoke(messageId: String): MessageDetail {
-        return chatRepository.getMessageById(
-            messageId = messageId
-        )
+        return chatRepository.getMessageDetail(messageId)
     }
 }

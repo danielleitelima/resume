@@ -1,11 +1,11 @@
 package com.danielleitelima.resume.chat.presentation.screen.article.detail
 
 import androidx.lifecycle.viewModelScope
-import com.danielleitelima.resume.chat.domain.usecase.GetRelatedArticle
+import com.danielleitelima.resume.chat.domain.usecase.GetArticle
 import kotlinx.coroutines.launch
 
 class IArticleDetailViewModel(
-    val getRelatedArticle: GetRelatedArticle
+    val getArticle: GetArticle
 ) : ArticleDetailViewModel() {
 
     override fun setInitialState(): ArticleDetailContract.State {
@@ -16,8 +16,8 @@ class IArticleDetailViewModel(
         when (event) {
             is ArticleDetailContract.Event.LoadArticle -> {
                 viewModelScope.launch {
-                    val article = getRelatedArticle(
-                        relatedArticleId = event.articleId
+                    val article = getArticle(
+                        articleId = event.articleId
                     )
 
                     setState {
