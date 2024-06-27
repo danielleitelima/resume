@@ -3,8 +3,6 @@ package com.danielleitelima.resume.activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
@@ -40,7 +38,6 @@ class MainActivity : ComponentActivity(){
         }
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     private fun MainScreenContent(
         navController: NavHostController,
@@ -52,16 +49,12 @@ class MainActivity : ComponentActivity(){
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     CompositionLocalProvider(LocalNavHostController provides navController) {
-                        CompositionLocalProvider(
-                            LocalOverscrollConfiguration provides null
+                        NavHost(
+                            navController = navController,
+                            startDestination = startDestination.route.uri,
                         ) {
-                            NavHost(
-                                navController = navController,
-                                startDestination = startDestination.route.uri,
-                            ) {
-                                registerHomeRoutes()
-                                registerChatRoutes()
-                            }
+                            registerHomeRoutes()
+                            registerChatRoutes()
                         }
                     }
                 }

@@ -1,0 +1,13 @@
+CREATE TABLE WordDefinition (
+    id TEXT PRIMARY KEY NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO WordDefinition
+VALUES(?);
+
+getById:
+SELECT *
+FROM WordDefinition
+WHERE id = :id;

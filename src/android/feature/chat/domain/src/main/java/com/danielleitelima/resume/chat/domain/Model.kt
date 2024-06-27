@@ -56,6 +56,7 @@ data class MessageDetail(
     val sections: List<Section>,
     val expressions: List<Expression>,
     val articles: List<Article>,
+    val vocabularies: List<Vocabulary>
 ){
     fun getHighlightedRanges(): List<HighlightedRange> {
         val highlightedRanges = mutableListOf<HighlightedRange>()
@@ -83,6 +84,58 @@ data class MessageDetail(
     }
 }
 
+data class Vocabulary(
+    val id: String,
+    val content: String,
+    val lemma: String,
+    val beginOffset: Int,
+    val word: Word,
+    val partsOfSpeech: String,
+    val aspect: String,
+    val case: String,
+    val form: String,
+    val gender: String,
+    val mood: String,
+    val number: String,
+    val person: String,
+    val tense: String,
+    val voice: String,
+    val dependencyId: String,
+    val dependencyType: String,
+)
+
+data class Word(
+    val id: String,
+    val content: String,
+    val meanings: List<WordMeaning>
+)
+
+data class WordMeaning(
+    val id: String,
+    val partsOfSpeech: String,
+    val definitions: List<WordDefinition>
+)
+
+data class WordDefinition(
+    val id: String,
+    val content: String,
+    val subDefinitions: List<WordSubDefinitions>,
+    val relatedWords: List<WordRelated>
+)
+
+data class WordRelated(
+    val id: String,
+    val content: String,
+    val isStrong: Boolean,
+    val type: String
+)
+
+data class WordSubDefinitions(
+    val id: String,
+    val content: String,
+    val examples: List<Example>
+)
+
 data class Section(
     val id: String,
     val content: String,
@@ -106,8 +159,7 @@ data class Meaning(
 
 data class Example(
     val id: String,
-    val content: String,
-    val translation: String
+    val content: String
 )
 
 data class Expression(

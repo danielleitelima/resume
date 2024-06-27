@@ -1,0 +1,18 @@
+CREATE TABLE WordDefinitionExampleRelation (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    wordSubDefinitionId TEXT NOT NULL,
+    exampleId TEXT NOT NULL
+);
+
+insert:
+INSERT INTO WordDefinitionExampleRelation (wordSubDefinitionId, exampleId)
+SELECT :wordDefinitionId, :exampleId
+WHERE NOT EXISTS (
+    SELECT 1 FROM WordDefinitionExampleRelation
+    WHERE wordSubDefinitionId = :wordDefinitionId AND exampleId = :exampleId
+);
+
+getByWordSubDefinitionId:
+SELECT *
+FROM WordDefinitionExampleRelation
+WHERE wordSubDefinitionId = :wordDefinitionId;

@@ -1,0 +1,29 @@
+CREATE TABLE Vocabulary (
+    id TEXT PRIMARY KEY NOT NULL,
+    content TEXT DEFAULT NULL,
+    lemma TEXT DEFAULT NULL,
+    beginOffset INTEGER DEFAULT NULL,
+    word TEXT DEFAULT NULL,
+    partsOfSpeech TEXT DEFAULT NULL,
+    aspect TEXT DEFAULT NULL,
+    'case' TEXT DEFAULT NULL,
+    form TEXT DEFAULT NULL,
+    gender TEXT DEFAULT NULL,
+    mood TEXT DEFAULT NULL,
+    number TEXT DEFAULT NULL,
+    person TEXT DEFAULT NULL,
+    tense TEXT DEFAULT NULL,
+    voice TEXT DEFAULT NULL,
+    dependencyId TEXT DEFAULT NULL,
+    dependencyType TEXT NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO Vocabulary
+VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getById:
+SELECT *
+FROM Vocabulary
+WHERE id = :id;

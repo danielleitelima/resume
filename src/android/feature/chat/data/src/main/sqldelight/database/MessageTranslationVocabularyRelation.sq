@@ -1,0 +1,18 @@
+CREATE TABLE MessageTranslationVocabularyRelation (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    messageTranslationId TEXT NOT NULL,
+    vocabularyId TEXT NOT NULL
+);
+
+insert:
+INSERT INTO MessageTranslationVocabularyRelation (messageTranslationId, vocabularyId)
+SELECT :messageTranslationId, :vocabularyId
+WHERE NOT EXISTS (
+    SELECT 1 FROM MessageTranslationVocabularyRelation
+    WHERE messageTranslationId = :messageTranslationId AND vocabularyId = :vocabularyId
+);
+
+getByMessageTranslationId:
+SELECT *
+FROM MessageTranslationVocabularyRelation
+WHERE messageTranslationId = :messageTranslationId;

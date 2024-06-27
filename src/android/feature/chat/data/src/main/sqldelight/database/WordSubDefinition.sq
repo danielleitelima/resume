@@ -1,0 +1,14 @@
+CREATE TABLE WordSubDefinition (
+    id TEXT PRIMARY KEY NOT NULL,
+    content TEXT DEFAULT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO WordSubDefinition
+VALUES(?, ?);
+
+getById:
+SELECT *
+FROM WordSubDefinition
+WHERE id = :id;

@@ -1,0 +1,14 @@
+CREATE TABLE Word (
+    id TEXT PRIMARY KEY NOT NULL,
+    content TEXT DEFAULT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO Word
+VALUES(?, ?);
+
+getById:
+SELECT *
+FROM Word
+WHERE id = :id;

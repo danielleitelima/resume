@@ -1,0 +1,15 @@
+CREATE TABLE WordDefinitionTranslation (
+    id TEXT PRIMARY KEY NOT NULL,
+    content TEXT DEFAULT NULL,
+    languagesCode TEXT NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO WordDefinitionTranslation
+VALUES(?, ?, ?);
+
+getById:
+SELECT *
+FROM WordDefinitionTranslation
+WHERE id = :id;
