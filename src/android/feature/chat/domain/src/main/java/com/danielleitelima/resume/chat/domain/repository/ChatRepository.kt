@@ -6,6 +6,7 @@ import com.danielleitelima.resume.chat.domain.Language
 import com.danielleitelima.resume.chat.domain.MessageDetail
 import com.danielleitelima.resume.chat.domain.MessageOption
 import com.danielleitelima.resume.chat.domain.OpenChat
+import com.danielleitelima.resume.chat.domain.Vocabulary
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
@@ -47,4 +48,6 @@ interface ChatRepository {
     fun setSelectedTargetLanguage(languageId: String)
 
     fun setSelectedTranslationLanguage(languageId: String)
+    suspend fun getVocabulary(vocabularyId: String): Vocabulary
+    suspend fun fetchWords(ids: List<String>)
 }

@@ -7,3 +7,8 @@ insert:
 INSERT OR REPLACE
 INTO Example
 VALUES(?, ?);
+
+getById:
+SELECT *
+FROM Example
+WHERE id = :id;

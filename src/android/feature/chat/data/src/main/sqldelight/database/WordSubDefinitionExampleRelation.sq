@@ -6,10 +6,10 @@ CREATE TABLE WordDefinitionExampleRelation (
 
 insert:
 INSERT INTO WordDefinitionExampleRelation (wordSubDefinitionId, exampleId)
-SELECT :wordDefinitionId, :exampleId
+SELECT :wordSubDefinitionId, :exampleId
 WHERE NOT EXISTS (
     SELECT 1 FROM WordDefinitionExampleRelation
-    WHERE wordSubDefinitionId = :wordDefinitionId AND exampleId = :exampleId
+    WHERE wordSubDefinitionId = :wordSubDefinitionId AND exampleId = :exampleId
 );
 
 getByWordSubDefinitionId:

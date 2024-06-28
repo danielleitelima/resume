@@ -53,44 +53,18 @@ data class MessageDetail(
     val isUserSent: Boolean,
     val translation: String,
     val content: String,
-    val sections: List<Section>,
     val expressions: List<Expression>,
     val articles: List<Article>,
     val vocabularies: List<Vocabulary>
-){
-    fun getHighlightedRanges(): List<HighlightedRange> {
-        val highlightedRanges = mutableListOf<HighlightedRange>()
-
-        sections.forEach { section ->
-            var currentPosition = 0
-            var count = 0
-
-            while (true) {
-                val start = content.indexOf(section.content, currentPosition)
-                if (start == -1) break
-
-                val end = start + section.content.length
-                currentPosition = end
-
-                if (count == section.position) {
-                    highlightedRanges.add(HighlightedRange(sectionId = section.id, start = start, end = end))
-                    break
-                }
-                count++
-            }
-        }
-
-        return highlightedRanges
-    }
-}
+)
 
 data class Vocabulary(
     val id: String,
     val content: String,
     val lemma: String,
     val beginOffset: Int,
-    val word: Word,
-    val partsOfSpeech: String,
+    val word: String?,
+    val partOfSpeech: String,
     val aspect: String,
     val case: String,
     val form: String,
@@ -100,8 +74,8 @@ data class Vocabulary(
     val person: String,
     val tense: String,
     val voice: String,
-    val dependencyId: String,
-    val dependencyType: String,
+    val dependency: String?,
+    val dependencyType: String?,
 )
 
 data class Word(
@@ -133,27 +107,6 @@ data class WordRelated(
 data class WordSubDefinitions(
     val id: String,
     val content: String,
-    val examples: List<Example>
-)
-
-data class Section(
-    val id: String,
-    val content: String,
-    val position: Int,
-    val meanings: List<Meaning>
-)
-
-data class HighlightedRange(
-    val sectionId: String,
-    val start: Int,
-    val end: Int
-)
-
-data class Meaning(
-    val id: String,
-    val main: Boolean,
-    val content: String,
-    val translation: String,
     val examples: List<Example>
 )
 

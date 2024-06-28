@@ -1,5 +1,6 @@
 package com.danielleitelima.resume.chat.presentation.screen.message.detail
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,7 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,10 +59,8 @@ import androidx.navigation.NavBackStackEntry
 import com.danielleitelima.resume.chat.domain.Article
 import com.danielleitelima.resume.chat.domain.Example
 import com.danielleitelima.resume.chat.domain.Expression
-import com.danielleitelima.resume.chat.domain.HighlightedRange
-import com.danielleitelima.resume.chat.domain.Meaning
 import com.danielleitelima.resume.chat.domain.MessageDetail
-import com.danielleitelima.resume.chat.domain.Section
+import com.danielleitelima.resume.chat.domain.Vocabulary
 import com.danielleitelima.resume.chat.presentation.R
 import com.danielleitelima.resume.chat.presentation.screen.component.ArticleItem
 import com.danielleitelima.resume.foundation.presentation.foundation.LocalNavHostController
@@ -96,15 +94,14 @@ object MessageDetailScreen : Screen {
         val state by viewModel.state.collectAsState()
 
         val textToSpeechManager: TextToSpeechManager = remember { getKoinInstance() }
-        var selectedSection by remember { mutableStateOf<String?>(null) }
+        var selectedVocabulary by remember { mutableStateOf<String?>(null) }
         val bottomSheetState = rememberModalBottomSheetState(
             skipPartiallyExpanded = true
         )
         val isMessagePlaying = remember { mutableStateOf(false) }
-        val isSectionPlaying = remember { mutableStateOf(false) }
+        val isWordPlaying = remember { mutableStateOf(false) }
 
         val messageDetail = state.messageDetail
-        val highlightSections = messageDetail?.getHighlightedRanges()
 
         LaunchedEffect(messageId) {
             if (messageId != null){
@@ -156,18 +153,13 @@ object MessageDetailScreen : Screen {
 
                     ContentSection(
                         messageDetail = messageDetail,
-                        highlightSections = highlightSections.orEmpty(),
-                        onSectionSelected = {
-                            val clickedEntry = highlightSections?.find { section ->
-                                section.start <= it.toInt() && section.end >= it.toInt()
+                        onVocabularySelected = {
+                            val clickedVocabulary = messageDetail.vocabularies.find { vocabulary ->
+                                vocabulary.beginOffset <= it.toInt() && vocabulary.beginOffset + vocabulary.content.length >= it.toInt()
                             }
 
-                            val clickedSection = messageDetail.sections.find { section ->
-                                section.id == clickedEntry?.sectionId
-                            }
-
-                            clickedSection?.let { section ->
-                                selectedSection = section.id
+                            clickedVocabulary?.let { section ->
+                                selectedVocabulary = section.id
                             }
                         }
                     )
@@ -198,15 +190,15 @@ object MessageDetailScreen : Screen {
             },
         )
 
-        if (selectedSection != null) {
-            val section = messageDetail?.sections?.find { it.id == selectedSection } ?: return
+        if (selectedVocabulary != null) {
+            val vocabulary = messageDetail?.vocabularies?.find { it.id == selectedVocabulary } ?: return
             textToSpeechManager.stopSpeaking()
             isMessagePlaying.value = false
 
-            SectionModal(bottomSheetState = bottomSheetState, section = section, isPlaying = isSectionPlaying){
-                selectedSection = null
+            VocabularyModal(bottomSheetState = bottomSheetState, vocabulary = vocabulary, isPlaying = isWordPlaying){
+                selectedVocabulary = null
                 textToSpeechManager.stopSpeaking()
-                isSectionPlaying.value = false
+                isWordPlaying.value = false
             }
         }
     }
@@ -214,10 +206,10 @@ object MessageDetailScreen : Screen {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SectionModal(
+private fun VocabularyModal(
     modifier: Modifier = Modifier,
     bottomSheetState: SheetState,
-    section: Section,
+    vocabulary: Vocabulary,
     isPlaying: MutableState<Boolean>,
     onDismiss: () -> Unit = {},
 ) {
@@ -238,31 +230,31 @@ private fun SectionModal(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = section.content,
+                    text = vocabulary.content,
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.width(Dimension.Spacing.XS.dp))
                 TextToSpeechButton(
-                    text = section.content,
+                    text = vocabulary.content,
                     isPlaying = isPlaying
                 )
             }
             Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
 
-            val mainMeaning = section.meanings.firstOrNull { it.main }
-            MeaningItem(meaning = mainMeaning)
-            Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
-
-            val otherMeanings = section.meanings.filter { it.main.not() }
-            if (otherMeanings.isEmpty()) {
-                return@Column
-            }
-
-            HorizontalDivider()
-            Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
-            MeaningList(meanings = otherMeanings)
-            Spacer(modifier = Modifier.height(Dimension.Spacing.XXL.dp))
+//            val mainMeaning = vocabulary.meanings.firstOrNull { it.main }
+//            MeaningItem(meaning = mainMeaning)
+//            Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+//
+//            val otherMeanings = vocabulary.meanings.filter { it.main.not() }
+//            if (otherMeanings.isEmpty()) {
+//                return@Column
+//            }
+//
+//            HorizontalDivider()
+//            Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+//            MeaningList(meanings = otherMeanings)
+//            Spacer(modifier = Modifier.height(Dimension.Spacing.XXL.dp))
         }
     }
 }
@@ -270,9 +262,8 @@ private fun SectionModal(
 @Composable
 private fun ContentSection(
     modifier: Modifier = Modifier,
-    onSectionSelected: (String) -> Unit = {},
     messageDetail: MessageDetail,
-    highlightSections: List<HighlightedRange>
+    onVocabularySelected: (String) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -280,21 +271,24 @@ private fun ContentSection(
             .padding(horizontal = Dimension.Spacing.L.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Log.d("MessageDetailScreen", "ContentSection: messageDetail.content: ${messageDetail.content}")
         ExtendedSpansText(
+
             text = buildAnnotatedString {
                 append(messageDetail.content)
-                highlightSections.forEach { highlight ->
+                messageDetail.vocabularies.forEach { vocabulary ->
+                    Log.d("MessageDetailScreen", "ContentSection: vocabulary: ${vocabulary.content}, beginOffset: ${vocabulary.beginOffset}, endOffset: ${vocabulary.beginOffset + vocabulary.content.length}")
                     addStyle(
                         style = SpanStyle(
                             textDecoration = TextDecoration.Underline,
                             color = MaterialTheme.colorScheme.primary
                         ),
-                        start = highlight.start,
-                        end = highlight.end
+                        start = vocabulary.beginOffset,
+                        end = vocabulary.beginOffset + vocabulary.content.length
                     )
                 }
             },
-            onClick = onSectionSelected
+            onClick = onVocabularySelected
         )
         Spacer(modifier = Modifier.size(Dimension.Spacing.S.dp))
         Text(
@@ -410,50 +404,50 @@ private fun ArticleSection(
     }
 }
 
-@Composable
-private fun MeaningList(
-    modifier: Modifier = Modifier,
-    meanings: List<Meaning>
-){
-    Column(
-        modifier = modifier
-    ) {
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(R.string.message_detail_section_label_other_meaning),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(modifier = Modifier.height(Dimension.Spacing.S.dp))
-        meanings.forEach { meaning ->
-            MeaningItem(
-                meaning = meaning
-            )
-            Spacer(modifier = Modifier.height(Dimension.Spacing.S.dp))
-        }
-    }
-}
-
-@Composable
-private fun MeaningItem(
-    modifier: Modifier = Modifier,
-    meaning: Meaning?
-) {
-    if (meaning == null) return
-
-    Column(
-        modifier = modifier
-    ) {
-        Text(
-            text = meaning.translation,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
-        ExampleList(examples = meaning.examples)
-    }
-}
+//@Composable
+//private fun MeaningList(
+//    modifier: Modifier = Modifier,
+//    meanings: List<Meaning>
+//){
+//    Column(
+//        modifier = modifier
+//    ) {
+//        Text(
+//            modifier = Modifier.fillMaxWidth(),
+//            text = stringResource(R.string.message_detail_section_label_other_meaning),
+//            style = MaterialTheme.typography.labelSmall,
+//            color = MaterialTheme.colorScheme.onSurface,
+//            textAlign = TextAlign.Center,
+//        )
+//        Spacer(modifier = Modifier.height(Dimension.Spacing.S.dp))
+//        meanings.forEach { meaning ->
+//            MeaningItem(
+//                meaning = meaning
+//            )
+//            Spacer(modifier = Modifier.height(Dimension.Spacing.S.dp))
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun MeaningItem(
+//    modifier: Modifier = Modifier,
+//    meaning: Meaning?
+//) {
+//    if (meaning == null) return
+//
+//    Column(
+//        modifier = modifier
+//    ) {
+//        Text(
+//            text = meaning.translation,
+//            style = MaterialTheme.typography.titleMedium,
+//            color = MaterialTheme.colorScheme.onSurface,
+//        )
+//        Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
+//        ExampleList(examples = meaning.examples)
+//    }
+//}
 
 @Composable
 private fun ExampleList(

@@ -9,4 +9,5 @@ interface ChatRemote {
     suspend fun getTargetLanguages(): AvailableLanguagesResponse
     suspend fun getTranslationLanguages(): AvailableLanguagesResponse
     fun getImageUrl(resourceId: String): String
+    suspend fun getWords(ids: List<String>): WordsResponse
 }

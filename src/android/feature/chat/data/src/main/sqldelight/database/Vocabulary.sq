@@ -1,21 +1,21 @@
 CREATE TABLE Vocabulary (
     id TEXT PRIMARY KEY NOT NULL,
-    content TEXT DEFAULT NULL,
-    lemma TEXT DEFAULT NULL,
-    beginOffset INTEGER DEFAULT NULL,
+    content TEXT NOT NULL,
+    lemma TEXT NOT NULL,
+    beginOffset INTEGER NOT NULL,
     word TEXT DEFAULT NULL,
-    partsOfSpeech TEXT DEFAULT NULL,
-    aspect TEXT DEFAULT NULL,
-    'case' TEXT DEFAULT NULL,
-    form TEXT DEFAULT NULL,
-    gender TEXT DEFAULT NULL,
-    mood TEXT DEFAULT NULL,
-    number TEXT DEFAULT NULL,
-    person TEXT DEFAULT NULL,
-    tense TEXT DEFAULT NULL,
-    voice TEXT DEFAULT NULL,
-    dependencyId TEXT DEFAULT NULL,
-    dependencyType TEXT NOT NULL
+    partOfSpeech TEXT NOT NULL,
+    aspect TEXT NOT NULL,
+    'case' TEXT NOT NULL,
+    form TEXT NOT NULL,
+    gender TEXT NOT NULL,
+    mood TEXT NOT NULL,
+    number TEXT NOT NULL,
+    person TEXT NOT NULL,
+    tense TEXT NOT NULL,
+    voice TEXT NOT NULL,
+    dependency TEXT DEFAULT NULL,
+    dependencyType TEXT DEFAULT NULL
 );
 
 insert:

@@ -6,10 +6,10 @@ CREATE TABLE WordMeaningDefinitionRelation (
 
 insert:
 INSERT INTO WordMeaningDefinitionRelation (wordMeaningId, wordDefinitionId)
-SELECT :wordDefinitionId, :wordDefinitionId
+SELECT :wordMeaningId, :wordDefinitionId
 WHERE NOT EXISTS (
     SELECT 1 FROM WordMeaningDefinitionRelation
-    WHERE wordMeaningId = :wordDefinitionId AND wordDefinitionId = :wordDefinitionId
+    WHERE wordMeaningId = :wordMeaningId AND wordDefinitionId = :wordDefinitionId
 );
 
 getByWordMeaningId:

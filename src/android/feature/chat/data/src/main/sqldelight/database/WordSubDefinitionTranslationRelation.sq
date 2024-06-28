@@ -1,15 +1,15 @@
 CREATE TABLE WordSubDefinitionTranslationRelation (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     wordSubDefinitionId TEXT NOT NULL,
-    wordDefinitionTranslationId TEXT NOT NULL
+    wordSubDefinitionTranslationId TEXT NOT NULL
 );
 
 insert:
-INSERT INTO WordSubDefinitionTranslationRelation (wordSubDefinitionId, wordDefinitionTranslationId)
-SELECT :wordDefinitionId, :wordDefinitionTranslationId
+INSERT INTO WordSubDefinitionTranslationRelation (wordSubDefinitionId, wordSubDefinitionTranslationId)
+SELECT :wordSubDefinitionId, :wordSubDefinitionTranslationId
 WHERE NOT EXISTS (
     SELECT 1 FROM WordSubDefinitionTranslationRelation
-    WHERE wordSubDefinitionId = :wordDefinitionId AND wordDefinitionTranslationId = :wordDefinitionTranslationId
+    WHERE wordSubDefinitionId = :wordSubDefinitionId AND wordSubDefinitionTranslationId = :wordSubDefinitionTranslationId
 );
 
 getByWordSubDefinitionId:

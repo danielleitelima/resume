@@ -1,5 +1,6 @@
 package com.danielleitelima.resume.chat.data.datasource.remote
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.android.Android
@@ -10,10 +11,10 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
 class IChatRemote(
-    private val client: HttpClient
-): ChatRemote {
+    private val client: HttpClient,
+) : ChatRemote {
 
-    companion object{
+    companion object {
         private const val BASE_URL = "https://directus.danielleitelima.com"
     }
 
@@ -201,6 +202,44 @@ class IChatRemote(
             append("related_message_id.translations.articles.article_id.translations.teaser")
             append(",")
             append("related_message_id.translations.articles.article_id.translations.content")
+            append(",")
+            append("related_message_id.translations.vocabulary.article_id.translations.content")
+            append(",")
+            append("related_message_id.translations.vocabularies.id")
+            append(",")
+            append("related_message_id.translations.vocabularies.content")
+            append(",")
+            append("related_message_id.translations.vocabularies.partOfSpeech")
+            append(",")
+            append("related_message_id.translations.vocabularies.aspect")
+            append(",")
+            append("related_message_id.translations.vocabularies.case")
+            append(",")
+            append("related_message_id.translations.vocabularies.form")
+            append(",")
+            append("related_message_id.translations.vocabularies.lemma")
+            append(",")
+            append("related_message_id.translations.vocabularies.beginOffset")
+            append(",")
+            append("related_message_id.translations.vocabularies.gender")
+            append(",")
+            append("related_message_id.translations.vocabularies.mood")
+            append(",")
+            append("related_message_id.translations.vocabularies.number")
+            append(",")
+            append("related_message_id.translations.vocabularies.person")
+            append(",")
+            append("related_message_id.translations.vocabularies.reciprocity")
+            append(",")
+            append("related_message_id.translations.vocabularies.tense")
+            append(",")
+            append("related_message_id.translations.vocabularies.voice")
+            append(",")
+            append("related_message_id.translations.vocabularies.dependencyType")
+            append(",")
+            append("related_message_id.translations.vocabularies.dependency")
+            append(",")
+            append("related_message_id.translations.vocabularies.word")
             append("&")
             append("filter[message_id][_eq]=")
             append(messageId)
@@ -210,7 +249,7 @@ class IChatRemote(
         return client.get(url).call.body<ReplyMessageDetailResponse>()
     }
 
-    override suspend fun getMessageDetail(id: String): MessageDetailResponse {
+    override suspend fun getMessageDetail(messageId: String): MessageDetailResponse {
         val url = buildString {
             append("$BASE_URL/items/message")
             append("?")
@@ -288,11 +327,98 @@ class IChatRemote(
             append("translations.articles.article_id.translations.teaser")
             append(",")
             append("translations.articles.article_id.translations.content")
+            append(",")
+            append("translations.vocabularies.id")
+            append(",")
+            append("translations.vocabularies.content")
+            append(",")
+            append("translations.vocabularies.partOfSpeech")
+            append(",")
+            append("translations.vocabularies.aspect")
+            append(",")
+            append("translations.vocabularies.case")
+            append(",")
+            append("translations.vocabularies.form")
+            append(",")
+            append("translations.vocabularies.lemma")
+            append(",")
+            append("translations.vocabularies.beginOffset")
+            append(",")
+            append("translations.vocabularies.gender")
+            append(",")
+            append("translations.vocabularies.mood")
+            append(",")
+            append("translations.vocabularies.number")
+            append(",")
+            append("translations.vocabularies.person")
+            append(",")
+            append("translations.vocabularies.reciprocity")
+            append(",")
+            append("translations.vocabularies.tense")
+            append(",")
+            append("translations.vocabularies.voice")
+            append(",")
+            append("translations.vocabularies.dependencyType")
+            append(",")
+            append("translations.vocabularies.dependency")
+            append(",")
+            append("translations.vocabularies.word")
             append("&")
             append("filter[id][_eq]=")
-            append(id)
+            append(messageId)
         }
         return client.get(url).call.body<MessageDetailResponse>()
+    }
+
+
+    override suspend fun getWords(ids: List<String>): WordsResponse {
+        val url = buildString {
+            append("$BASE_URL/items/word")
+            append("?fields=")
+            append("id")
+            append(",")
+            append("content")
+            append(",")
+            append("meanings.word_meaning_id.id")
+            append(",")
+            append("meanings.word_meaning_id.partOfSpeech")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.id")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.translations.id")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.translations.content")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.translations.languages_code")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.relatedWords.word_related_id.id")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.relatedWords.word_related_id.content")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.relatedWords.word_related_id.strong")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.relatedWords.word_related_id.type")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.subDefinitions.word_sub_definition_id.id")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.subDefinitions.word_sub_definition_id.translations.id")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.subDefinitions.word_sub_definition_id.translations.content")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.subDefinitions.word_sub_definition_id.translations.languages_code")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.subDefinitions.word_sub_definition_id.examples.example_id.id")
+            append(",")
+            append("meanings.word_meaning_id.definitions.word_definition_id.subDefinitions.word_sub_definition_id.examples.example_id.content")
+            append("&")
+            append("filter[id][_eq]=")
+            append(ids.first())
+        }
+
+        Log.d("IChatRemote", "getWordIds: $ids")
+        Log.d("IChatRemote", "getWords: ${client.get(url).call.body<String>()}")
+
+        return client.get(url).call.body<WordsResponse>()
     }
 
     override fun getImageUrl(resourceId: String): String {
