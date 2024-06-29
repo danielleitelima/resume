@@ -42,5 +42,5 @@ val chatPresentationModule = module {
     factory<ExpressionListViewModel> { IExpressionListViewModel(get()) }
     factory<HomeViewModel> { IHomeViewModel(get(), get()) }
     factory<MessageDetailViewModel> { IMessageDetailViewModel(get()) }
-    factory<MessageListViewModel> { IMessageListViewModel(get(), get(), get()) }
+    factory<MessageListViewModel> { IMessageListViewModel(get(), get(), get(), get(),get()) }
 }

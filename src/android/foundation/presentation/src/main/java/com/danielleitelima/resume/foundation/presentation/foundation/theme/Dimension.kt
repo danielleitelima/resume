@@ -7,6 +7,7 @@ sealed class Dimension(
 ) {
     data object Flag : Dimension(48)
     data object Icon : Dimension(24)
+    data object SmallIcon : Dimension(18)
     data object CornerRadius : Dimension(12)
     data object Elevation : Dimension(4)
     data object Stroke : Dimension(3)

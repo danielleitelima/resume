@@ -3,10 +3,11 @@ package com.danielleitelima.resume.chat.domain.repository
 import com.danielleitelima.resume.chat.domain.Article
 import com.danielleitelima.resume.chat.domain.Chat
 import com.danielleitelima.resume.chat.domain.Language
-import com.danielleitelima.resume.chat.domain.MessageDetail
+import com.danielleitelima.resume.chat.domain.Message
 import com.danielleitelima.resume.chat.domain.MessageOption
 import com.danielleitelima.resume.chat.domain.OpenChat
 import com.danielleitelima.resume.chat.domain.Vocabulary
+import com.danielleitelima.resume.chat.domain.Word
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
@@ -27,9 +28,11 @@ interface ChatRepository {
 
     suspend fun fetchMessageDetail(messageId: String)
 
-    suspend fun fetchFirstReplyDetail(messageId: String): MessageDetail
+    suspend fun fetchFirstReplyDetail(messageId: String): Message
 
-    suspend fun getMessageDetail(messageId: String): MessageDetail
+    suspend fun getMessage(messageId: String): Message
+
+    suspend fun getWord(wordId: String): Word
 
     suspend fun getArticle(articleId: String): Article
 

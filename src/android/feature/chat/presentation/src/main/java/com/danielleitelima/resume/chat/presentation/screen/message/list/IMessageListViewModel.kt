@@ -2,6 +2,8 @@ package com.danielleitelima.resume.chat.presentation.screen.message.list
 
 import androidx.lifecycle.viewModelScope
 import com.danielleitelima.resume.chat.domain.usecase.GetActiveChat
+import com.danielleitelima.resume.chat.domain.usecase.GetMessage
+import com.danielleitelima.resume.chat.domain.usecase.GetWord
 import com.danielleitelima.resume.chat.domain.usecase.RollbackToMessage
 import com.danielleitelima.resume.chat.domain.usecase.SelectMessageOption
 import kotlinx.coroutines.launch
@@ -9,7 +11,9 @@ import kotlinx.coroutines.launch
 class IMessageListViewModel(
     private val selectMessageOption: SelectMessageOption,
     private val getActiveChat: GetActiveChat,
-    private val rollbackToMessage: RollbackToMessage
+    private val rollbackToMessage: RollbackToMessage,
+    private val getMessage: GetMessage,
+    private val getWord: GetWord
 ) : MessageListViewModel() {
 
     override fun setInitialState(): MessageListContract.State {
@@ -43,6 +47,46 @@ class IMessageListViewModel(
                 viewModelScope.launch {
                     val chatId = state.value.openChat?.id ?: return@launch
                     rollbackToMessage(chatId = chatId, messageId = event.messageId)
+                }
+            }
+
+            is MessageListContract.Event.SelectMessage -> {
+                viewModelScope.launch {
+                    setState {
+                        copy(
+                            selectedMessage = null,
+                        )
+                    }
+
+                    val message = getMessage(
+                        messageId = event.messageId
+                    )
+
+                    setState {
+                        copy(
+                            selectedMessage = message
+                        )
+                    }
+                }
+            }
+
+            is MessageListContract.Event.SelectWord -> {
+                viewModelScope.launch {
+                    setState {
+                        copy(
+                            selectedWord = null,
+                        )
+                    }
+
+                    val word = getWord(
+                        wordId = event.wordId
+                    )
+
+                    setState {
+                        copy(
+                            selectedWord = word
+                        )
+                    }
                 }
             }
         }

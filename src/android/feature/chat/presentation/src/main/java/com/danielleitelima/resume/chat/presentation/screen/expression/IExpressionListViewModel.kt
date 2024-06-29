@@ -1,11 +1,11 @@
 package com.danielleitelima.resume.chat.presentation.screen.expression
 
 import androidx.lifecycle.viewModelScope
-import com.danielleitelima.resume.chat.domain.usecase.GetMessageDetail
+import com.danielleitelima.resume.chat.domain.usecase.GetMessage
 import kotlinx.coroutines.launch
 
 class IExpressionListViewModel(
-    val getMessageDetail: GetMessageDetail
+    val getMessageDetail: GetMessage
 ) : ExpressionListViewModel() {
     override fun setInitialState(): ExpressionListContract.State {
         return ExpressionListContract.State()

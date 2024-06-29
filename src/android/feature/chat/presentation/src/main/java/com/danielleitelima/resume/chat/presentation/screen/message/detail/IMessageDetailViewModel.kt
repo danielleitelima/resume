@@ -1,12 +1,12 @@
 package com.danielleitelima.resume.chat.presentation.screen.message.detail
 
 import androidx.lifecycle.viewModelScope
-import com.danielleitelima.resume.chat.domain.usecase.GetMessageDetail
+import com.danielleitelima.resume.chat.domain.usecase.GetMessage
 import kotlinx.coroutines.launch
 
 
 class IMessageDetailViewModel(
-    private val getMessageDetail: GetMessageDetail
+    private val getMessageDetail: GetMessage
 ) : MessageDetailViewModel() {
 
     override fun setInitialState(): MessageDetailContract.State {

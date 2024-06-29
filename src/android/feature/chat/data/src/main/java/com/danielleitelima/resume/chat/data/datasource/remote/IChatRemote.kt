@@ -372,6 +372,8 @@ class IChatRemote(
 
 
     override suspend fun getWords(ids: List<String>): WordsResponse {
+        val idList = ids.joinToString(",") { it }
+
         val url = buildString {
             append("$BASE_URL/items/word")
             append("?fields=")
@@ -411,11 +413,12 @@ class IChatRemote(
             append(",")
             append("meanings.word_meaning_id.definitions.word_definition_id.subDefinitions.word_sub_definition_id.examples.example_id.content")
             append("&")
-            append("filter[id][_eq]=")
-            append(ids.first())
+            append("filter[id][_in]=")
+            append(ids.joinToString(",") { it })
         }
 
-        Log.d("IChatRemote", "getWordIds: $ids")
+        Log.d("IChatRemote", "url: $url")
+        Log.d("IChatRemote", "getWordIds: $idList")
         Log.d("IChatRemote", "getWords: ${client.get(url).call.body<String>()}")
 
         return client.get(url).call.body<WordsResponse>()

@@ -48,7 +48,7 @@ data class MessageOption(
     val content: String
 )
 
-data class MessageDetail(
+data class Message(
     val id : String,
     val isUserSent: Boolean,
     val translation: String,
@@ -100,7 +100,7 @@ data class WordDefinition(
 data class WordRelated(
     val id: String,
     val content: String,
-    val isStrong: Boolean,
+    val strong: Boolean,
     val type: String
 )
 

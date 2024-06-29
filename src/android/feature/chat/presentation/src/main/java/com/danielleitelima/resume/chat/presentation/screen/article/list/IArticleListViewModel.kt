@@ -1,12 +1,12 @@
 package com.danielleitelima.resume.chat.presentation.screen.article.list
 
 import androidx.lifecycle.viewModelScope
-import com.danielleitelima.resume.chat.domain.usecase.GetMessageDetail
+import com.danielleitelima.resume.chat.domain.usecase.GetMessage
 import kotlinx.coroutines.launch
 
 
 class IArticleListViewModel(
-    val getMessageDetail: GetMessageDetail
+    val getMessageDetail: GetMessage
 ) : ArticleListViewModel() {
     override fun setInitialState(): ArticleListContract.State {
         return ArticleListContract.State()

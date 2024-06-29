@@ -17,11 +17,16 @@ import com.danielleitelima.resume.chat.domain.Chat
 import com.danielleitelima.resume.chat.domain.Example
 import com.danielleitelima.resume.chat.domain.Expression
 import com.danielleitelima.resume.chat.domain.Language
-import com.danielleitelima.resume.chat.domain.MessageDetail
+import com.danielleitelima.resume.chat.domain.Message
 import com.danielleitelima.resume.chat.domain.MessageOption
 import com.danielleitelima.resume.chat.domain.OpenChat
 import com.danielleitelima.resume.chat.domain.SentMessage
 import com.danielleitelima.resume.chat.domain.Vocabulary
+import com.danielleitelima.resume.chat.domain.Word
+import com.danielleitelima.resume.chat.domain.WordDefinition
+import com.danielleitelima.resume.chat.domain.WordMeaning
+import com.danielleitelima.resume.chat.domain.WordRelated
+import com.danielleitelima.resume.chat.domain.WordSubDefinitions
 import com.danielleitelima.resume.chat.domain.repository.ChatRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -138,7 +143,7 @@ class IChatRepository(
         }
     }
 
-    override suspend fun getMessageDetail(messageId: String): MessageDetail {
+    override suspend fun getMessage(messageId: String): Message {
         val message = database.messageQueries.getById(messageId).executeAsOne()
 
         val messageTranslationLanguage = database.messageTranslationRelationQueries.getByMessageId(messageId).executeAsList().map { messageTranslationRelation ->
@@ -165,7 +170,7 @@ class IChatRepository(
             getVocabulary(it.vocabularyId)
         }
 
-        return MessageDetail(
+        return Message(
             id = message.id,
             content = messageTargetLanguage.content,
             articles = articles,
@@ -178,7 +183,7 @@ class IChatRepository(
 
     override suspend fun getVocabulary(vocabularyId: String): Vocabulary {
         val vocabulary = database.vocabularyQueries.getById(vocabularyId).executeAsOneOrNull()
-            ?: throw Exception("Article not found or translation not available for the selected language")
+            ?: throw Exception("Vocabulary not found or translation not available for the selected language")
 
         return Vocabulary(
             id = vocabulary.id,
@@ -198,6 +203,91 @@ class IChatRepository(
             gender = vocabulary.gender,
             dependency = vocabulary.dependency,
             dependencyType = vocabulary.dependencyType,
+        )
+    }
+
+    override suspend fun getWord(wordId: String): Word {
+        val word = try {
+            database.wordQueries.getById(wordId).executeAsOne()
+        } catch (e: Exception) {
+            throw Exception("Word not found for the id $wordId")
+        }
+
+        val meanings = database.wordMeaningRelationQueries.getByWordId(wordId).executeAsList().map {
+            getWordMeaning(it.wordMeaningId)
+        }
+
+        return Word(
+            id = word.id,
+            content = word.content.orEmpty(),
+            meanings = meanings
+        )
+    }
+
+    private fun getWordMeaning(wordMeaningId: String): WordMeaning {
+        val wordMeaning = database.wordMeaningQueries.getById(wordMeaningId).executeAsOneOrNull()
+            ?: throw Exception("Word meaning not found for the id $wordMeaningId")
+
+        val definitions = database.wordMeaningDefinitionRelationQueries.getByWordMeaningId(wordMeaningId).executeAsList().map {
+            getDefinition(it.wordDefinitionId)
+        }
+
+        return WordMeaning(
+            id = wordMeaning.id,
+            partsOfSpeech = wordMeaning.partOfSpeech.orEmpty(),
+            definitions = definitions
+        )
+    }
+
+    private fun getDefinition(wordDefinitionId: String): WordDefinition {
+        val content = database.wordDefinitionTranslationRelationQueries.getByWordDefinitionId(wordDefinitionId).executeAsList().map { wordDefinitionTranslationRelation ->
+            database.wordDefinitionTranslationQueries.getById(wordDefinitionTranslationRelation.wordDefinitionTranslationId).executeAsOne()
+        }.first {
+            it.languagesCode == getSelectedTranslationLanguage().code
+        }.content
+
+        val subDefinitions = database.wordDefinitionSubDefinitionRelationQueries.getByWordDefinitionId(wordDefinitionId).executeAsList().map {
+            getSubDefinition(it.wordSubDefinitionId)
+        }
+
+        val relatedWords = database.wordDefinitionWordRelatedRelationQueries.getByWordDefinitionId(wordDefinitionId).executeAsList().map {
+            getWordRelated(it.wordRelatedId)
+        }
+
+        return WordDefinition(
+            id = wordDefinitionId,
+            content = content.orEmpty(),
+            subDefinitions = subDefinitions,
+            relatedWords = relatedWords
+        )
+    }
+
+    private fun getSubDefinition(wordSubDefinitionId: String): WordSubDefinitions {
+        val content = database.wordSubDefinitionTranslationRelationQueries.getByWordSubDefinitionId(wordSubDefinitionId).executeAsList().map { wordSubDefinitionTranslationRelation ->
+            database.wordSubDefinitionTranslationQueries.getById(wordSubDefinitionTranslationRelation.wordSubDefinitionTranslationId).executeAsOne()
+        }.first {
+            it.languagesCode == getSelectedTranslationLanguage().code
+        }.content
+
+        val examples = database.wordSubDefinitionExampleRelationQueries.getByWordSubDefinitionId(wordSubDefinitionId).executeAsList().map {
+            getExample(it.exampleId)
+        }
+
+        return WordSubDefinitions(
+            id = wordSubDefinitionId,
+            content = content.orEmpty(),
+            examples = examples
+        )
+    }
+
+    private fun getWordRelated(wordRelatedId: String): WordRelated {
+        val wordRelated = database.wordRelatedQueries.getById(wordRelatedId).executeAsOne()
+
+        return WordRelated(
+            id = wordRelated.id,
+            content = wordRelated.content.orEmpty(),
+            strong = wordRelated.strong ?: false,
+            type = wordRelated.type.orEmpty()
         )
     }
 
@@ -453,7 +543,7 @@ class IChatRepository(
             wordResponse.meanings.forEach { meaning ->
 
                 database.wordMeaningQueries.insert(
-                    id = meaning.wordMeaningId.partOfSpeech,
+                    id = meaning.wordMeaningId.id,
                     partOfSpeech = meaning.wordMeaningId.partOfSpeech,
                 )
 
@@ -510,6 +600,10 @@ class IChatRepository(
                             )
                         }
 
+                        database.wordDefinitionSubDefinitionRelationQueries.insert(
+                            wordDefinitionId = definition.wordDefinitionId.id,
+                            wordSubDefinitionId = subDefinition.wordSubDefinitionId.id,
+                        )
                     }
 
                     definition.wordDefinitionId.relatedWords.forEach { relatedWord ->
@@ -525,19 +619,29 @@ class IChatRepository(
                             wordRelatedId = relatedWord.wordRelatedId.id,
                         )
                     }
+
+                    database.wordMeaningDefinitionRelationQueries.insert(
+                        wordMeaningId = meaning.wordMeaningId.id,
+                        wordDefinitionId = definition.wordDefinitionId.id,
+                    )
                 }
+
+                database.wordMeaningRelationQueries.insert(
+                    wordId = wordResponse.id,
+                    wordMeaningId = meaning.wordMeaningId.id,
+                )
             }
         }
     }
 
-    override suspend fun fetchFirstReplyDetail(messageId: String): MessageDetail {
+    override suspend fun fetchFirstReplyDetail(messageId: String): Message {
         val message = chatRemote.getFirstReplyOptionDetail(messageId).data.first().relatedMessageId
 
         message.cache()
 
         val words = message.translations.flatMap { translation ->
-            translation.vocabularies.map { vocabulary ->
-                vocabulary.id
+            translation.vocabularies.mapNotNull { vocabulary ->
+                vocabulary.word
             }
         }
 
@@ -563,7 +667,7 @@ class IChatRepository(
             expression.toExpression(getSelectedTranslationLanguage().code)
         }
 
-        return MessageDetail(
+        return Message(
             id = message.id,
             isUserSent = message.userSent,
             content = messageTargetLanguage.content,

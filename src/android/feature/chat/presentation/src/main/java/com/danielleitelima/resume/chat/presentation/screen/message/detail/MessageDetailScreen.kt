@@ -1,6 +1,5 @@
 package com.danielleitelima.resume.chat.presentation.screen.message.detail
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -59,7 +58,7 @@ import androidx.navigation.NavBackStackEntry
 import com.danielleitelima.resume.chat.domain.Article
 import com.danielleitelima.resume.chat.domain.Example
 import com.danielleitelima.resume.chat.domain.Expression
-import com.danielleitelima.resume.chat.domain.MessageDetail
+import com.danielleitelima.resume.chat.domain.Message
 import com.danielleitelima.resume.chat.domain.Vocabulary
 import com.danielleitelima.resume.chat.presentation.R
 import com.danielleitelima.resume.chat.presentation.screen.component.ArticleItem
@@ -262,7 +261,7 @@ private fun VocabularyModal(
 @Composable
 private fun ContentSection(
     modifier: Modifier = Modifier,
-    messageDetail: MessageDetail,
+    messageDetail: Message,
     onVocabularySelected: (String) -> Unit = {},
 ) {
     Column(
@@ -271,13 +270,10 @@ private fun ContentSection(
             .padding(horizontal = Dimension.Spacing.L.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Log.d("MessageDetailScreen", "ContentSection: messageDetail.content: ${messageDetail.content}")
         ExtendedSpansText(
-
             text = buildAnnotatedString {
                 append(messageDetail.content)
                 messageDetail.vocabularies.forEach { vocabulary ->
-                    Log.d("MessageDetailScreen", "ContentSection: vocabulary: ${vocabulary.content}, beginOffset: ${vocabulary.beginOffset}, endOffset: ${vocabulary.beginOffset + vocabulary.content.length}")
                     addStyle(
                         style = SpanStyle(
                             textDecoration = TextDecoration.Underline,

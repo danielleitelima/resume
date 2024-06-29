@@ -13,3 +13,4 @@ getById:
 SELECT *
 FROM WordDefinitionTranslation
 WHERE id = :id;
+
