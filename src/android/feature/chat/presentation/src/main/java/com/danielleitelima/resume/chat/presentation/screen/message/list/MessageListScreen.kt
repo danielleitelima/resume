@@ -1,5 +1,6 @@
 package com.danielleitelima.resume.chat.presentation.screen.message.list
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -9,6 +10,7 @@ import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -27,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -67,6 +70,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -83,6 +87,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavBackStackEntry
@@ -90,6 +95,7 @@ import com.danielleitelima.resume.chat.domain.Message
 import com.danielleitelima.resume.chat.domain.MessageOption
 import com.danielleitelima.resume.chat.domain.OpenChat
 import com.danielleitelima.resume.chat.domain.SentMessage
+import com.danielleitelima.resume.chat.domain.Vocabulary
 import com.danielleitelima.resume.chat.domain.Word
 import com.danielleitelima.resume.chat.domain.WordMeaning
 import com.danielleitelima.resume.chat.presentation.R
@@ -137,11 +143,11 @@ object MessageListScreen : Screen {
         var showWordDialog by remember { mutableStateOf(false) }
 
         val messageSheetState = rememberModalBottomSheetState(
-            skipPartiallyExpanded = true
+            skipPartiallyExpanded = false,
         )
 
         val vocabularySheetState = rememberModalBottomSheetState(
-            skipPartiallyExpanded = true
+            skipPartiallyExpanded = false
         )
 
         val textToSpeechManager: TextToSpeechManager = remember { getKoinInstance() }
@@ -149,8 +155,10 @@ object MessageListScreen : Screen {
         val isMessagePlaying = remember { mutableStateOf(false) }
         val isWordPlaying = remember { mutableStateOf(false) }
 
+        var selectedVocabulary = remember { mutableStateOf<Vocabulary?>(null) }
+
         LaunchedEffect(chatId) {
-            if (chatId != null){
+            if (chatId != null) {
                 viewModel.setEvent(MessageListContract.Event.LoadChat(chatId))
             }
         }
@@ -174,7 +182,8 @@ object MessageListScreen : Screen {
                         }
                     },
                     navigationIcon = {
-                        val icon = AnimatedImageVector.animatedVectorResource(R.drawable.ic_close_to_arrow_back)
+                        val icon =
+                            AnimatedImageVector.animatedVectorResource(R.drawable.ic_close_to_arrow_back)
 
                         val hasSelectedMessage = selectedSentMessageId != null
 
@@ -188,7 +197,10 @@ object MessageListScreen : Screen {
                             }
                         ) {
                             Icon(
-                                painter = rememberAnimatedVectorPainter(icon, hasSelectedMessage.not()),
+                                painter = rememberAnimatedVectorPainter(
+                                    icon,
+                                    hasSelectedMessage.not()
+                                ),
                                 contentDescription = stringResource(R.string.content_description_back_or_close),
                                 modifier = Modifier.size(Dimension.Icon.dp),
                                 tint = MaterialTheme.colorScheme.onSurface
@@ -198,7 +210,10 @@ object MessageListScreen : Screen {
                     actions = {
                         val show = selectedSentMessageId != null
                         if (show.not()) return@TopAppBar
-                        val scale = animateFloatAsState(if (show) 1f else 0f, label = stringResource(R.string.animation_label_scale))
+                        val scale = animateFloatAsState(
+                            if (show) 1f else 0f,
+                            label = stringResource(R.string.animation_label_scale)
+                        )
 
                         IconButton(
                             onClick = {
@@ -221,7 +236,10 @@ object MessageListScreen : Screen {
                                     it.messageId == selectedSentMessageId
                                 }?.content.orEmpty()
 
-                                context.copyToClipboard(messageContent, context.getString(R.string.message_list_alert_content_copy))
+                                context.copyToClipboard(
+                                    messageContent,
+                                    context.getString(R.string.message_list_alert_content_copy)
+                                )
                                 selectedSentMessageId = null
                             }
                         ) {
@@ -244,7 +262,7 @@ object MessageListScreen : Screen {
             content = { paddingValues ->
                 val openChat = state.openChat
 
-                if (state.isLoading || openChat == null){
+                if (state.isLoading || openChat == null) {
                     return@Scaffold
                 }
 
@@ -326,41 +344,61 @@ object MessageListScreen : Screen {
         }
 
         if (showMessageDialog) {
+            val dependencyVocabulary = state.selectedMessage?.vocabularies?.firstOrNull {
+                it.dependency == selectedVocabulary.value?.id
+            }
+
             MessageModal(
                 sheetState = messageSheetState,
-                messageDetail = state.selectedMessage,
+                message = state.selectedMessage,
                 isPlaying = isMessagePlaying,
+                word = state.selectedWord,
+                selectedVocabulary = selectedVocabulary.value,
+                dependencyVocabulary = dependencyVocabulary,
                 onDismiss = {
                     showMessageDialog = false
+                    viewModel.setEvent(MessageListContract.Event.SelectWord(null))
+                    selectedVocabulary.value = null
                 },
                 onWordSelected = {
-                    val clickedVocabulary = state.selectedMessage?.vocabularies?.find { vocabulary ->
-                        val index = state.selectedMessage?.content?.indexOf(vocabulary.content) ?: return@find false
+                    val clickedVocabulary =
+                        state.selectedMessage?.vocabularies?.find { vocabulary ->
+                            val beginOffset = vocabulary.beginOffset
 
-                        index <= it.toInt() && index + vocabulary.content.length >= it.toInt()
-                    }
+                            beginOffset <= it.toInt() && beginOffset + vocabulary.content.length >= it.toInt()
+                        }
 
                     clickedVocabulary?.let { vocabulary ->
                         val word = vocabulary.word ?: return@let
-
-                        showWordDialog = true
-                        viewModel.setEvent(MessageListContract.Event.SelectWord(word))
+                        coroutineScope.launch {
+                            messageSheetState.partialExpand()
+                            viewModel.setEvent(MessageListContract.Event.SelectWord(word))
+                            selectedVocabulary.value = vocabulary
+                        }
                     }
                 }
             )
         }
 
-        if (showWordDialog) {
-            showMessageDialog = false
-            textToSpeechManager.stopSpeaking()
-            isMessagePlaying.value = false
-
-            WordModal(bottomSheetState = bottomSheetState, word = state.selectedWord, isPlaying = isWordPlaying){
-                showWordDialog = false
-                textToSpeechManager.stopSpeaking()
-                isWordPlaying.value = false
-            }
-        }
+//        if (showWordDialog) {
+//            textToSpeechManager.stopSpeaking()
+//            isMessagePlaying.value = false
+//
+//            WordModal(
+//                modifier = Modifier.verticalScroll(rememberScrollState()),
+//                bottomSheetState = vocabularySheetState,
+//                word = state.selectedWord,
+//                isPlaying = isWordPlaying
+//            ){
+//                coroutineScope.launch {
+//                    messageSheetState.show()
+//                }
+//
+//                showWordDialog = false
+//                textToSpeechManager.stopSpeaking()
+//                isWordPlaying.value = false
+//            }
+//        }
     }
 }
 
@@ -370,8 +408,8 @@ private fun MessageListView(
     selectedMessageId: String?,
     openChat: OpenChat,
     onMessageSelected: (String) -> Unit,
-    onMessageLongPressed: (String) -> Unit
-){
+    onMessageLongPressed: (String) -> Unit,
+) {
     val lastIndex =
         if (openChat.history.isEmpty()) 0
         else openChat.history.size - 1
@@ -416,8 +454,8 @@ private fun MessageListView(
 
 @Composable
 private fun EmptyChatView(
-    modifier: Modifier = Modifier
-){
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -445,15 +483,16 @@ private fun EmptyChatView(
 @Composable
 private fun BottomBar(
     enabled: Boolean,
-    onClick: () -> Unit
-){
+    onClick: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(Dimension.Spacing.M.dp)
     ) {
-        val buttonColor = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+        val buttonColor =
+            if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
 
         Box(
             modifier = Modifier
@@ -463,7 +502,7 @@ private fun BottomBar(
                     if (enabled.not()) return@clickable
                     onClick()
                 },
-        )  {
+        ) {
             Row(
                 modifier = Modifier
                     .padding(Dimension.Spacing.S.dp)
@@ -495,7 +534,7 @@ private fun MessageOptionModal(
     onDismiss: () -> Unit = {},
     onOptionSelected: (String) -> Unit = {},
     onStay: () -> Unit = {},
-    onExplore: () -> Unit = {}
+    onExplore: () -> Unit = {},
 ) {
     ModalBottomSheet(
         modifier = modifier,
@@ -503,12 +542,12 @@ private fun MessageOptionModal(
         sheetState = bottomSheetState,
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
-        if (messageOptions.isEmpty()){
+        if (messageOptions.isEmpty()) {
             CompletedChatView(
                 onExplore = onExplore,
                 onStay = onStay
             )
-        } else{
+        } else {
             MessageOptionList(
                 messageOptions = messageOptions.orEmpty(),
                 onOptionSelected = onOptionSelected
@@ -520,8 +559,8 @@ private fun MessageOptionModal(
 @Composable
 private fun MessageOptionList(
     messageOptions: List<MessageOption>,
-    onOptionSelected: (String) -> Unit
-){
+    onOptionSelected: (String) -> Unit,
+) {
     var selectedMessageOptionId by remember { mutableStateOf<String?>(null) }
 
     Column(
@@ -532,7 +571,7 @@ private fun MessageOptionList(
             MessageOptionItem(
                 messageOption = it,
                 isSelected = selectedMessageOptionId == it.id,
-            ){
+            ) {
                 selectedMessageOptionId = if (selectedMessageOptionId == it.id) "" else it.id
             }
 
@@ -554,8 +593,8 @@ private fun MessageOptionList(
 @Composable
 private fun CompletedChatView(
     onExplore: () -> Unit,
-    onStay: () -> Unit
-){
+    onStay: () -> Unit,
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -620,8 +659,8 @@ private fun CompletedChatView(
 private fun SendButton(
     modifier: Modifier = Modifier,
     enabled: Boolean,
-    onClick: () -> Unit
-){
+    onClick: () -> Unit,
+) {
     Button(
         modifier = modifier,
         enabled = enabled,
@@ -645,10 +684,13 @@ private fun SendButton(
 private fun MessageOptionItem(
     messageOption: MessageOption,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Clickable(onClick = onClick) {
-        val border = if (isSelected) BorderStroke(Dimension.Stroke.dp, MaterialTheme.colorScheme.primary) else null
+        val border = if (isSelected) BorderStroke(
+            Dimension.Stroke.dp,
+            MaterialTheme.colorScheme.primary
+        ) else null
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -661,7 +703,10 @@ private fun MessageOptionItem(
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = Dimension.Spacing.M.dp, vertical = Dimension.Spacing.S.dp),
+                    .padding(
+                        horizontal = Dimension.Spacing.M.dp,
+                        vertical = Dimension.Spacing.S.dp
+                    ),
                 text = messageOption.content,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
@@ -677,13 +722,15 @@ private fun SentMessageItem(
     sentMessage: SentMessage,
     isSelected: Boolean,
     onClick: (String) -> Unit,
-    onLongPress: (String) -> Unit = {}
+    onLongPress: (String) -> Unit = {},
 ) {
     val alignment = if (sentMessage.isUserSent) Alignment.CenterEnd else Alignment.CenterStart
     val columnAlignment = if (sentMessage.isUserSent) Alignment.End else Alignment.Start
 
-    val containerColor = if (sentMessage.isUserSent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer
-    val contentColor = if (sentMessage.isUserSent) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondaryContainer
+    val containerColor =
+        if (sentMessage.isUserSent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer
+    val contentColor =
+        if (sentMessage.isUserSent) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondaryContainer
 
     val paddingStart = if (sentMessage.isUserSent) 68.dp else 0.dp
     val paddingEnd = if (sentMessage.isUserSent) 0.dp else 68.dp
@@ -736,8 +783,7 @@ private fun SentMessageItem(
                 modifier = Modifier
                     .clip(shape)
                     .background(containerColor)
-                    .widthIn(min = 80.dp)
-                ,
+                    .widthIn(min = 80.dp),
             ) {
                 Text(
                     modifier = Modifier
@@ -768,7 +814,7 @@ private fun SentMessageItem(
 @Composable
 private fun RollbackDialog(
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
@@ -780,14 +826,14 @@ private fun RollbackDialog(
                     onConfirm()
                     onDismiss()
                 }
-            ){
+            ) {
                 Text(stringResource(R.string.rollback_dialog_button_confirm))
             }
         },
         dismissButton = {
             TextButton(
                 onClick = { onDismiss() }
-            ){
+            ) {
                 Text(stringResource(R.string.rollback_dialog_button_cancel))
             }
         }
@@ -799,27 +845,268 @@ private fun RollbackDialog(
 private fun MessageModal(
     modifier: Modifier = Modifier,
     sheetState: SheetState,
-    messageDetail: Message?,
+    message: Message?,
+    word: Word?,
+    selectedVocabulary: Vocabulary?,
+    dependencyVocabulary: Vocabulary?,
     isPlaying: MutableState<Boolean>,
     onDismiss: () -> Unit = {},
-    onWordSelected: (String) -> Unit = {}
+    onWordSelected: (String) -> Unit = {},
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
     ) {
-        ContentSection(
+        Column(
             modifier = modifier
                 .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceContainerLow)
                 .padding(
-                    start = Dimension.Spacing.XL.dp,
-                    end = Dimension.Spacing.XL.dp,
-                    bottom = Dimension.Spacing.XXL.dp
-                ),
-            message = messageDetail,
-            onWordSelected = onWordSelected,
-            isPlaying = isPlaying
+                    start = Dimension.Spacing.L.dp,
+                    end = Dimension.Spacing.L.dp,
+                    top = Dimension.Spacing.M.dp,
+                )
+                .verticalScroll(rememberScrollState())
+            ,
+        ) {
+            ContentSection(
+                message = message,
+                word = word,
+                onWordSelected = onWordSelected,
+                isPlaying = isPlaying
+            )
+
+            Spacer(modifier = Modifier.height(Dimension.Spacing.XL.dp))
+
+            AnimatedContent(
+                targetState = word,
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(50)) togetherWith fadeOut(animationSpec = tween(50))
+                }
+            ) { word ->
+                if (word == null) return@AnimatedContent
+
+                Column {
+                    TextDivider(
+                        text = "Main meaning",
+                        backgroundColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    )
+
+                    Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+
+                    val inlineContentId = "icon"
+
+                    val annotatedString = buildAnnotatedString {
+                        append(word.content)
+                        appendInlineContent(inlineContentId, "[icon]")
+                    }
+
+                    val inlineContent = mapOf(
+                        inlineContentId to InlineTextContent(
+                            Placeholder(36.sp, 32.sp, PlaceholderVerticalAlign.TextCenter)
+                        ) {
+                            TextToSpeechButton(
+                                modifier = Modifier.padding(start = Dimension.Spacing.XXS.dp),
+                                text = word.content,
+                                isPlaying = isPlaying
+                            )
+                        }
+                    )
+
+                    Text(
+                        text = annotatedString,
+                        inlineContent = inlineContent,
+                        lineHeight = 32.sp,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+
+                    Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+
+                    val mainMeaning = word.meanings.firstOrNull {
+                        it.partsOfSpeech == selectedVocabulary?.partOfSpeech
+                    } ?: word.meanings.firstOrNull()
+
+                    if (mainMeaning != null) {
+                        MeaningItem(meaning = mainMeaning)
+                        Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+                    }
+
+                    TextDivider(
+                        text = "Syntax",
+                        backgroundColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                    )
+
+                    ListItem(
+                        modifier = Modifier.padding(bottom = Dimension.Spacing.XS.dp),
+                        content = selectedVocabulary?.case.orEmpty()
+                    )
+
+                    ListItem(
+                        modifier = Modifier.padding(bottom = Dimension.Spacing.XS.dp),
+                        content = selectedVocabulary?.aspect.orEmpty()
+                    )
+
+                    ListItem(
+                        modifier = Modifier.padding(bottom = Dimension.Spacing.XS.dp),
+                        content = selectedVocabulary?.gender.orEmpty()
+                    )
+
+                    ListItem(
+                        modifier = Modifier.padding(bottom = Dimension.Spacing.XS.dp),
+                        content = selectedVocabulary?.form.orEmpty()
+                    )
+
+                    ListItem(
+                        modifier = Modifier.padding(bottom = Dimension.Spacing.XS.dp),
+                        content = selectedVocabulary?.number.orEmpty()
+                    )
+
+                    ListItem(
+                        modifier = Modifier.padding(bottom = Dimension.Spacing.XS.dp),
+                        content = selectedVocabulary?.person.orEmpty()
+                    )
+
+                    ListItem(
+                        modifier = Modifier.padding(bottom = Dimension.Spacing.XS.dp),
+                        content = selectedVocabulary?.tense.orEmpty()
+                    )
+
+                    ListItem(
+                        modifier = Modifier.padding(bottom = Dimension.Spacing.XS.dp),
+                        content = selectedVocabulary?.voice.orEmpty()
+                    )
+
+                    ListItem(
+                        modifier = Modifier.padding(bottom = Dimension.Spacing.M.dp),
+                        content = selectedVocabulary?.mood.orEmpty()
+                    )
+
+                    if (selectedVocabulary != null && dependencyVocabulary != null && selectedVocabulary.id != dependencyVocabulary.id) {
+                        VocabularyDependencySection(
+                            selectedVocabulary = selectedVocabulary,
+                            dependencyVocabulary = dependencyVocabulary,
+                        )
+                        Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+                    }
+
+                    val hasOtherMeanings = word.meanings.size > 1
+
+                    if (hasOtherMeanings) {
+                        TextDivider(
+                            text = "Other meanings",
+                            backgroundColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                        )
+
+                        Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+
+                        word.meanings.forEachIndexed { index, meaning ->
+                            if (mainMeaning?.id == meaning.id) return@forEachIndexed
+
+                            MeaningItem(meaning = meaning)
+                            Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+                            if (index < word.meanings.size - 1) {
+                                Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+                            }
+                        }
+                    } else{
+                        Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+                    }
+                }
+            }
+
+        }
+    }
+}
+
+@Composable
+private fun VocabularyDependencySection(
+    selectedVocabulary: Vocabulary,
+    dependencyVocabulary: Vocabulary,
+){
+    TextDivider(
+        text = "Dependency",
+        backgroundColor = MaterialTheme.colorScheme.surfaceContainerLow,
+    )
+
+    Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+
+    Column {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            text = selectedVocabulary.dependencyType.orEmpty(),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            VocabularyCard(
+                modifier = Modifier.weight(1f),
+                vocabulary = selectedVocabulary,
+            )
+            Spacer(modifier = Modifier.width(Dimension.Spacing.M.dp))
+            Text(text = "→", style = MaterialTheme.typography.bodyLarge)
+            Spacer(modifier = Modifier.width(Dimension.Spacing.M.dp))
+            VocabularyCard(
+                modifier = Modifier.weight(1f),
+                vocabulary = dependencyVocabulary,
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
+            )
+        }
+    }
+}
+
+@Composable
+private fun VocabularyCard(
+    modifier: Modifier = Modifier,
+    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    vocabulary: Vocabulary?,
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(Dimension.CornerRadius.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor,
+        ),
+    ) {
+        Column(
+            modifier = Modifier.padding(Dimension.Spacing.M.dp)
+        ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = vocabulary?.content.orEmpty(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+@Composable
+private fun ListItem(
+    modifier: Modifier = Modifier,
+    content: String,
+) {
+    if (content.lowercase().contains("unknown")) return
+
+    Row(
+        modifier = modifier,
+    ) {
+        Text(
+            text = "•",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.size(Dimension.Spacing.XXS.dp))
+        Text(
+            text = content,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -828,25 +1115,32 @@ private fun MessageModal(
 private fun ContentSection(
     modifier: Modifier = Modifier,
     message: Message?,
+    word: Word? = null,
     isPlaying: MutableState<Boolean>,
     onWordSelected: (String) -> Unit = {},
 ) {
     val inlineContentId = "icon"
 
-    val annotatedString = buildAnnotatedString {
+    val messageAnnotatedString = buildAnnotatedString {
         append(message?.content.orEmpty())
         message?.vocabularies?.forEach { vocabulary ->
             if (vocabulary.word == null) return@forEach
 
-            val index = message.content.indexOf(vocabulary.content)
+            val beginOffset = vocabulary.beginOffset
+
+            val color = if (vocabulary.word == word?.id) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.secondary
+            }
 
             addStyle(
                 style = SpanStyle(
                     textDecoration = TextDecoration.Underline,
-                    color = MaterialTheme.colorScheme.primary
+                    color = color
                 ),
-                start = index,
-                end = index + vocabulary.content.length
+                start = beginOffset,
+                end = beginOffset + vocabulary.content.length
             )
         }
         appendInlineContent(inlineContentId, "[icon]")
@@ -865,24 +1159,81 @@ private fun ContentSection(
     )
 
     Column(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ExtendedSpansText(
-            text = annotatedString,
+            text = messageAnnotatedString,
             inlineContent = inlineContent,
             onClick = onWordSelected
         )
         Spacer(modifier = Modifier.size(Dimension.Spacing.M.dp))
-        Text(
+        MaskedTextWithIcon(
+            modifier = Modifier.fillMaxWidth(),
             text = message?.translation.orEmpty(),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
         )
     }
 }
+
+@Composable
+fun MaskedTextWithIcon(
+    modifier: Modifier = Modifier,
+    text: String,
+) {
+    var isMasked by remember { mutableStateOf(true) }
+
+    val icon = if (isMasked) R.drawable.ic_hide else R.drawable.ic_show
+
+    val inlineContentId = "icon"
+
+    val annotatedString = buildAnnotatedString {
+        text.forEachIndexed { index, character ->
+            if (isMasked) {
+                withStyle(
+                    style = SpanStyle(
+                        background = MaterialTheme.colorScheme.surfaceVariant,
+                        color = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    append(character)
+                }
+            } else {
+                append(character)
+            }
+        }
+        appendInlineContent(inlineContentId, "[icon]")
+    }
+
+    val inlineContent = mapOf(
+        inlineContentId to InlineTextContent(
+            Placeholder(28.sp, 24.sp, PlaceholderVerticalAlign.TextCenter)
+        ) {
+            IconButton(
+                modifier = Modifier.padding(start = Dimension.Spacing.XXS.dp),
+                onClick = {
+                    isMasked = isMasked.not()
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = icon),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.outline
+                )
+            }
+        }
+    )
+
+    Text(
+        textAlign = TextAlign.Center,
+        lineHeight = 28.sp,
+        modifier = modifier,
+        text = annotatedString,
+        inlineContent = inlineContent,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.outline,
+    )
+}
+
 
 @Composable
 private fun ExtendedSpansText(
@@ -960,122 +1311,65 @@ fun CustomClickableText(
     )
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun WordModal(
-    modifier: Modifier = Modifier,
-    bottomSheetState: SheetState,
-    word: Word?,
-    isPlaying: MutableState<Boolean>,
-    onDismiss: () -> Unit = {},
-) {
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = bottomSheetState,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-    ) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = Dimension.Spacing.L.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-
-            val inlineContentId = "icon"
-
-            val annotatedString = buildAnnotatedString {
-                append(word?.content.orEmpty())
-                appendInlineContent(inlineContentId, "[icon]")
-            }
-
-            val inlineContent = mapOf(
-                inlineContentId to InlineTextContent(
-                    Placeholder(36.sp, 32.sp, PlaceholderVerticalAlign.TextCenter)
-                ) {
-                    TextToSpeechButton(
-                        modifier = Modifier.padding(start = Dimension.Spacing.XXS.dp),
-                        text = word?.content.orEmpty(),
-                        isPlaying = isPlaying
-                    )
-                }
-            )
-
-            Text(
-                text = annotatedString,
-                inlineContent = inlineContent,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-
-            Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
-
-            word?.meanings?.forEachIndexed { index, meaning ->
-                MeaningItem(meaning = meaning)
-                Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
-                if (index < word.meanings.size - 1) {
-                    HorizontalDivider(modifier = Modifier.fillMaxWidth())
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
-                }
-            }
-        }
-    }
-}
-
 @Composable
 private fun MeaningItem(
     meaning: WordMeaning,
-){
+) {
     Column(
         horizontalAlignment = Alignment.Start
     ) {
+        Text(
+            text = meaning.content + " " + "[ " + meaning.partsOfSpeech + " ]",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Spacer(modifier = Modifier.height(Dimension.Spacing.M.dp))
+
         meaning.definitions.forEach { definition ->
             Text(
                 text = definition.content,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onSurface,
             )
-            Spacer(modifier = Modifier.height(Dimension.Spacing.S.dp))
 
-            definition.subDefinitions.forEach { subDefinition ->
-                Text(
-                    text = subDefinition.content,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Spacer(modifier = Modifier.height(Dimension.Spacing.XXS.dp))
+            Spacer(modifier = Modifier.height(Dimension.Spacing.XXS.dp))
 
-                subDefinition.examples.forEach { example ->
-                    val inlineContentId = "icon"
+            definition.examples.forEach { example ->
+                val inlineContentId = "icon"
 
-                    val annotatedString = buildAnnotatedString {
-                        append(example.content)
-                        appendInlineContent(inlineContentId, "[icon]")
-                    }
-
-                    val inlineContent = mapOf(
-                        inlineContentId to InlineTextContent(
-                            Placeholder(32.sp, 32.sp, PlaceholderVerticalAlign.TextCenter)
-                        ) {
-                            TextToSpeechButton(
-                                text = example.content,
-                                isPlaying = remember { mutableStateOf(false) }
-                            )
-                        }
-                    )
-
-                    Text(
-                        text = annotatedString,
-                        inlineContent = inlineContent,
-                        lineHeight = 32.sp,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(modifier = Modifier.height(Dimension.Spacing.XXS.dp))
+                val annotatedString = buildAnnotatedString {
+                    append(example.content)
+                    appendInlineContent(inlineContentId, "[icon]")
                 }
 
-                Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
+                val inlineContent = mapOf(
+                    inlineContentId to InlineTextContent(
+                        Placeholder(32.sp, 32.sp, PlaceholderVerticalAlign.TextCenter)
+                    ) {
+                        TextToSpeechButton(
+                            text = example.content,
+                            isPlaying = remember { mutableStateOf(false) }
+                        )
+                    }
+                )
+
+                Text(
+                    text = annotatedString,
+                    inlineContent = inlineContent,
+                    lineHeight = 32.sp,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
+
+            Spacer(modifier = Modifier.height(Dimension.Spacing.XS.dp))
+        }
+
+        meaning.relatedWords.forEach { relatedWord ->
+            ListItem(
+                modifier = Modifier.padding(bottom = Dimension.Spacing.XS.dp),
+                content = relatedWord.type + ": " + relatedWord.content
+            )
         }
     }
 }
@@ -1084,7 +1378,7 @@ private fun MeaningItem(
 private fun TextToSpeechButton(
     modifier: Modifier = Modifier,
     text: String,
-    isPlaying: MutableState<Boolean>
+    isPlaying: MutableState<Boolean>,
 ) {
     val textToSpeechManager: TextToSpeechManager = remember { getKoinInstance() }
 
@@ -1112,6 +1406,32 @@ private fun TextToSpeechButton(
             contentDescription = stringResource(R.string.content_description_volume_up),
             modifier = Modifier.size(Dimension.Icon.dp),
             tint = MaterialTheme.colorScheme.outline
+        )
+    }
+}
+
+@Composable
+private fun TextDivider(
+    text: String,
+    backgroundColor: Color,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        HorizontalDivider(
+            modifier = Modifier.align(Alignment.CenterStart),
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant
+        )
+        Text(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .background(backgroundColor)
+                .padding(horizontal = Dimension.Spacing.XXS.dp),
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

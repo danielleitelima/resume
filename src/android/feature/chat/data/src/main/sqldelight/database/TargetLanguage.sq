@@ -28,13 +28,11 @@ FROM TargetLanguage;
 getCompleteTargetLanguages:
 SELECT tl.code, tlt.name, tl.flagUrl, tl.selected
 FROM TargetLanguage tl
-LEFT JOIN TargetLanguageTranslationRelation tlr ON tl.id = tlr.targetLanguageId
-LEFT JOIN TargetLanguageTranslation tlt ON tlr.targetLanguageTranslationId = tlt.id
+LEFT JOIN TargetLanguageTranslation tlt ON tl.id = tlt.targetLanguageId
 WHERE tlt.languagesCode = (SELECT code FROM TranslationLanguage WHERE selected = 1);
 
 getSelectedTargetLanguage:
 SELECT tl.code, tlt.name, tl.flagUrl, tl.selected
 FROM TargetLanguage tl
-JOIN TargetLanguageTranslationRelation tlr ON tl.id = tlr.targetLanguageId
-JOIN TargetLanguageTranslation tlt ON tlr.targetLanguageTranslationId = tlt.id
+JOIN TargetLanguageTranslation tlt ON tl.id = tlt.targetLanguageId
 WHERE tl.selected = 1 AND tlt.languagesCode = (SELECT code FROM TranslationLanguage WHERE selected = 1);

@@ -14,7 +14,7 @@ sealed class MessageListContract {
         data class SelectMessageOption(val messageId: String) : Event()
         data class RollbackToMessage(val messageId: String) : Event()
         data class SelectMessage(val messageId: String) : Event()
-        data class SelectWord(val wordId: String) : Event()
+        data class SelectWord(val wordId: String? = null) : Event()
     }
 
     data class State(

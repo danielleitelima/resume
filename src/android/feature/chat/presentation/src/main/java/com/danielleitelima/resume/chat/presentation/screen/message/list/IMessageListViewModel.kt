@@ -72,10 +72,20 @@ class IMessageListViewModel(
 
             is MessageListContract.Event.SelectWord -> {
                 viewModelScope.launch {
+                    val currentWordId = state.value.selectedWord?.id
+
                     setState {
                         copy(
                             selectedWord = null,
                         )
+                    }
+
+                    if (event.wordId == null) {
+                        return@launch
+                    }
+
+                    if (event.wordId == currentWordId) {
+                        return@launch
                     }
 
                     val word = getWord(

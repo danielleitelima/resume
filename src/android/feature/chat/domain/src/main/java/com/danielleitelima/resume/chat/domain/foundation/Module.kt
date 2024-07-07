@@ -1,7 +1,6 @@
 package com.danielleitelima.resume.chat.domain.foundation
 
 import com.danielleitelima.resume.chat.domain.usecase.GetActiveChat
-import com.danielleitelima.resume.chat.domain.usecase.GetArticle
 import com.danielleitelima.resume.chat.domain.usecase.GetChats
 import com.danielleitelima.resume.chat.domain.usecase.GetInitialData
 import com.danielleitelima.resume.chat.domain.usecase.GetMessage
@@ -21,6 +20,5 @@ val chatDomainModule = module {
     factory { GetMessage(get()) }
     factory { GetWord(get()) }
     factory { SelectMessageOption(get()) }
-    factory { GetArticle(get()) }
     factory { RollbackToMessage(get()) }
 }

@@ -1,0 +1,15 @@
+CREATE TABLE WordExample (
+    id TEXT PRIMARY KEY NOT NULL,
+    content TEXT NOT NULL,
+    wordDefinitionId TEXT NOT NULL
+);
+
+insert:
+INSERT OR REPLACE
+INTO WordExample
+VALUES(?, ?, ?);
+
+getByWordDefinitionId:
+SELECT *
+FROM WordExample
+WHERE wordDefinitionId = :wordDefinitionId;

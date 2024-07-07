@@ -53,8 +53,6 @@ data class Message(
     val isUserSent: Boolean,
     val translation: String,
     val content: String,
-    val expressions: List<Expression>,
-    val articles: List<Article>,
     val vocabularies: List<Vocabulary>
 )
 
@@ -87,14 +85,15 @@ data class Word(
 data class WordMeaning(
     val id: String,
     val partsOfSpeech: String,
-    val definitions: List<WordDefinition>
+    val content: String,
+    val definitions: List<WordDefinition>,
+    val relatedWords: List<WordRelated>
 )
 
 data class WordDefinition(
     val id: String,
     val content: String,
-    val subDefinitions: List<WordSubDefinitions>,
-    val relatedWords: List<WordRelated>
+    val examples: List<WordExample>
 )
 
 data class WordRelated(
@@ -104,33 +103,7 @@ data class WordRelated(
     val type: String
 )
 
-data class WordSubDefinitions(
-    val id: String,
-    val content: String,
-    val examples: List<Example>
-)
-
-data class Example(
+data class WordExample(
     val id: String,
     val content: String
 )
-
-data class Expression(
-    val id: String,
-    val content: String,
-    val description: String,
-    val examples: List<Example>
-)
-
-data class Article(
-    val id: String,
-    val dateCreated: Long,
-    val dateUpdated: Long?,
-    val readTime: Int,
-    val title: String,
-    val teaser: String,
-    val content: String
-){
-    val lastUpdate: Long
-        get() = dateUpdated ?: dateCreated
-}

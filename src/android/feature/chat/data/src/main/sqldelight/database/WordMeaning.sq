@@ -1,14 +1,15 @@
 CREATE TABLE WordMeaning (
     id TEXT PRIMARY KEY NOT NULL,
-    partOfSpeech TEXT DEFAULT NULL
+    partOfSpeech TEXT DEFAULT NULL,
+    wordId TEXT NOT NULL
 );
 
 insert:
 INSERT OR REPLACE
 INTO WordMeaning
-VALUES(?, ?);
+VALUES(?, ?, ?);
 
-getById:
+getByWordId:
 SELECT *
 FROM WordMeaning
-WHERE id = :id;
+WHERE wordId = :wordId;

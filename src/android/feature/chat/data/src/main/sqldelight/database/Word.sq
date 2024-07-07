@@ -1,12 +1,13 @@
 CREATE TABLE Word (
     id TEXT PRIMARY KEY NOT NULL,
-    content TEXT DEFAULT NULL
+    content TEXT DEFAULT NULL,
+    languagesCode TEXT NOT NULL
 );
 
 insert:
 INSERT OR REPLACE
 INTO Word
-VALUES(?, ?);
+VALUES(?, ?, ?);
 
 getById:
 SELECT *

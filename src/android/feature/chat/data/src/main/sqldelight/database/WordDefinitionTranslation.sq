@@ -1,16 +1,17 @@
 CREATE TABLE WordDefinitionTranslation (
     id TEXT PRIMARY KEY NOT NULL,
     content TEXT DEFAULT NULL,
-    languagesCode TEXT NOT NULL
+    languagesCode TEXT NOT NULL,
+    wordDefinitionId TEXT NOT NULL
 );
 
 insert:
 INSERT OR REPLACE
 INTO WordDefinitionTranslation
-VALUES(?, ?, ?);
+VALUES(?, ?, ?, ?);
 
-getById:
+getByWordDefinitionId:
 SELECT *
 FROM WordDefinitionTranslation
-WHERE id = :id;
+WHERE wordDefinitionId = :wordDefinitionId;
 

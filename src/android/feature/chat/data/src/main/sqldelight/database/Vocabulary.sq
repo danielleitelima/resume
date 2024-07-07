@@ -15,15 +15,16 @@ CREATE TABLE Vocabulary (
     tense TEXT NOT NULL,
     voice TEXT NOT NULL,
     dependency TEXT DEFAULT NULL,
-    dependencyType TEXT DEFAULT NULL
+    dependencyType TEXT DEFAULT NULL,
+    messageTranslationId TEXT NOT NULL
 );
 
 insert:
 INSERT OR REPLACE
 INTO Vocabulary
-VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
-getById:
+getByMessageTranslationId:
 SELECT *
 FROM Vocabulary
-WHERE id = :id;
+WHERE messageTranslationId = :messageTranslationId;

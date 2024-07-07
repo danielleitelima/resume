@@ -28,13 +28,11 @@ FROM TranslationLanguage;
 getCompleteTranslationLanguages:
 SELECT tl.code, tlt.name, tl.flagUrl, tl.selected
 FROM TranslationLanguage tl
-LEFT JOIN TranslationLanguageTranslationRelation tlr ON tl.id = tlr.translationLanguageId
-LEFT JOIN TranslationLanguageTranslation tlt ON tlr.translationLanguageTranslationId = tlt.id
+LEFT JOIN TranslationLanguageTranslation tlt ON tl.id = tlt.translationLanguageId
 WHERE tlt.languagesCode = (SELECT code FROM TranslationLanguage WHERE selected = 1);
 
 getSelectedTranslationLanguage:
 SELECT tl.code, tlt.name, tl.flagUrl, tl.selected
 FROM TranslationLanguage tl
-JOIN TranslationLanguageTranslationRelation tlr ON tl.id = tlr.translationLanguageId
-JOIN TranslationLanguageTranslation tlt ON tlr.translationLanguageTranslationId = tlt.id
-WHERE tl.selected = 1 AND tlt.languagesCode = tl.code;
+JOIN TranslationLanguageTranslation tlt ON tl.id = tlt.translationLanguageId
+WHERE tl.selected = 1 AND tlt.languagesCode = (SELECT code FROM TranslationLanguage WHERE selected = 1);

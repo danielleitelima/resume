@@ -1,19 +1,17 @@
-import kotlin.Boolean;
-
-CREATE TABLE WordRelated (
+CREATE TABLE WordMeaningTranslation (
     id TEXT PRIMARY KEY NOT NULL,
     content TEXT DEFAULT NULL,
-    strong INTEGER AS Boolean DEFAULT 0,
-    type TEXT DEFAULT NULL,
+    languagesCode TEXT NOT NULL,
     wordMeaningId TEXT NOT NULL
 );
 
 insert:
 INSERT OR REPLACE
-INTO WordRelated
-VALUES(?, ?, ?, ?, ?);
+INTO WordMeaningTranslation
+VALUES(?, ?, ?, ?);
 
 getByWordMeaningId:
 SELECT *
-FROM WordRelated
+FROM WordMeaningTranslation
 WHERE wordMeaningId = :wordMeaningId;
+

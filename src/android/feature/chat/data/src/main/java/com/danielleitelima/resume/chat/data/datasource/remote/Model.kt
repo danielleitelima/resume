@@ -118,8 +118,6 @@ data class MessageDetailTranslationResponse(
     val content: String,
     @SerialName("languages_code")
     val languagesCode: String,
-    val articles: List<ArticleResponse>,
-    val expressions: List<ExpressionResponse>,
     val vocabularies: List<VocabularyResponse>,
 )
 
@@ -145,58 +143,6 @@ data class VocabularyResponse(
 )
 
 @Serializable
-data class ExpressionResponse(
-    @SerialName("expression_id")
-    val expressionId: ExpressionDataResponse,
-)
-
-@Serializable
-data class ExpressionDataResponse(
-    val id: String,
-    val content: String,
-    @SerialName("languages_code")
-    val languagesCode: String,
-    val translations: List<ExpressionTranslationResponse>,
-    val examples: List<ExampleResponse>,
-)
-
-@Serializable
-data class ExpressionTranslationResponse(
-    val id: String,
-    val description: String,
-    @SerialName("languages_code")
-    val languagesCode: String,
-)
-
-@Serializable
-data class ArticleResponse(
-    @SerialName("article_id")
-    val articleId: ArticleDataResponse,
-)
-
-@Serializable
-data class ArticleDataResponse(
-    val id: String,
-    @SerialName("date_created")
-    val dateCreated: String,
-    @SerialName("date_updated")
-    val dateUpdated: String?,
-    val readTime: Int,
-    val translations: List<ArticleTranslationResponse>,
-)
-
-@Serializable
-data class ArticleTranslationResponse(
-    val id: String,
-    val title: String,
-    val teaser: String,
-    val content: String,
-    @SerialName("languages_code")
-    val languagesCode: String,
-)
-
-
-@Serializable
 data class WordsResponse(
     val data: List<WordData>
 )
@@ -205,34 +151,25 @@ data class WordsResponse(
 data class WordData(
     val id: String,
     val content: String,
-    val meanings: List<Meaning>
+    @SerialName("languages_code")
+    val languagesCode: String,
+    val meanings: List<WordMeaningData>
 )
 
 @Serializable
-data class Meaning(
-    @SerialName("word_meaning_id")
-    val wordMeaningId: WordMeaningId
-)
-
-@Serializable
-data class WordMeaningId(
+data class WordMeaningData(
     val id: String,
     val partOfSpeech: String,
-    val definitions: List<WordDefinition>
+    val definitions: List<WordDefinitionData>,
+    val relations: List<WordRelatedData>,
+    val translations: List<CommonTranslation>,
 )
 
 @Serializable
-data class WordDefinition(
-    @SerialName("word_definition_id")
-    val wordDefinitionId: WordDefinitionId
-)
-
-@Serializable
-data class WordDefinitionId(
+data class WordDefinitionData(
     val id: String,
     val translations: List<CommonTranslation>,
-    val relatedWords: List<RelatedWord>,
-    val subDefinitions: List<SubDefinition>
+    val examples: List<WordExampleData>
 )
 
 @Serializable
@@ -244,13 +181,7 @@ data class CommonTranslation(
 )
 
 @Serializable
-data class RelatedWord(
-    @SerialName("word_related_id")
-    val wordRelatedId: WordRelatedId
-)
-
-@Serializable
-data class WordRelatedId(
+data class WordRelatedData(
     val id: String,
     val content: String,
     val strong: Boolean,
@@ -258,26 +189,7 @@ data class WordRelatedId(
 )
 
 @Serializable
-data class SubDefinition(
-    @SerialName("word_sub_definition_id")
-    val wordSubDefinitionId: WordSubDefinitionId
-)
-
-@Serializable
-data class WordSubDefinitionId(
-    val id: String,
-    val translations: List<CommonTranslation>,
-    val examples: List<ExampleResponse>
-)
-
-@Serializable
-data class ExampleResponse(
-    @SerialName("example_id")
-    val exampleData: ExampleData
-)
-
-@Serializable
-data class ExampleData(
+data class WordExampleData(
     val id: String,
     val content: String
 )

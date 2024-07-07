@@ -1,15 +1,16 @@
 CREATE TABLE ChatTranslation (
     id TEXT PRIMARY KEY NOT NULL,
     title TEXT NOT NULL,
-    languagesCode TEXT NOT NULL
+    languagesCode TEXT NOT NULL,
+    chat_id TEXT NOT NULL
 );
 
 insert:
 INSERT OR REPLACE
 INTO ChatTranslation
-VALUES(?, ?, ?);
+VALUES(?, ?, ?, ?);
 
-getById:
+getByChatId:
 SELECT *
 FROM ChatTranslation
-WHERE id = :id;
+WHERE chat_id = :chat_id;

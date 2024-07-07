@@ -1,13 +1,14 @@
 CREATE TABLE WordDefinition (
-    id TEXT PRIMARY KEY NOT NULL
+    id TEXT PRIMARY KEY NOT NULL,
+    wordMeaningId TEXT NOT NULL
 );
 
 insert:
 INSERT OR REPLACE
 INTO WordDefinition
-VALUES(?);
+VALUES(?, ?);
 
-getById:
+getByWordMeaningId:
 SELECT *
 FROM WordDefinition
-WHERE id = :id;
+WHERE wordMeaningId = :wordMeaningId;
