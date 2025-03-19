@@ -1,7 +1,7 @@
 {
   "personalData": {
     "name": "Daniel Leite Lima",
-    "description": "Mobile software engineer\nAndroid | KMM | Flutter",
+    "description": "Senior Software Developer\nAndroid | iOS | React Native | React | Vue | Go",
     "location": "Berlin, Germany",
     "photoUrl": "https://danielleitelima.github.io/resume/assets/profile_photo.jpg",
     "emailAddress": "limaleite.daniel@gmail.com",
@@ -10,16 +10,44 @@
   },
   "introduction": {
     "title": "Hi there!",
-    "description": "I am a highly experienced Mobile Software Developer based in Berlin, Germany. My extensive background in the technology sector has allowed me to refine a broad spectrum of skills, particularly in Android, Kotlin Multiplatform Mobile (KMM), and Flutter development. My diverse experiences across healthcare, pharmaceutical logistics, banking, legal services, and public safety sectors have enriched me with a deep understanding of varied market demands and the innovative use of technology to address these needs."
+    "description": "I am a highly experienced Software Developer based in Berlin, Germany. My extensive background in the technology sector has allowed me to refine a broad spectrum of skills, such as Android and iOS native development, React native, Kotlin multiplatform and flutter for cross platform development, React.js and VUE.js for web develpment and Golang, Typescript and Java technologies for back-end development. My diverse experiences across healthcare, pharmaceutical logistics, banking, legal services, and public safety sectors have enriched me with a deep understanding of varied market demands and the innovative use of technology to address customer needs."
   },
   "skills": [
+    {
+      "description": "iOS",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_ios.svg"
+    },
     {
       "description": "Android",
       "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_android.svg"
     },
     {
-      "description": "Android Jetpack",
-      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_jetpack.svg"
+      "description": "React native",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_react_native.svg"
+    },
+    {
+      "description": "KMM",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_kmm.svg"
+    },
+    {
+      "description": "React.js",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_react.svg"
+    },
+    {
+      "description": "Vue.js",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_vue.svg"
+    },
+    {
+      "description": "Go",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_go.svg"
+    },
+    {
+      "description": "Figma",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_figma.svg"
+    },
+    {
+      "description": "Docker",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_docker.svg"
     },
     {
       "description": "Kotlin",
@@ -28,6 +56,14 @@
     {
       "description": "Java",
       "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_java.svg"
+    },
+    {
+      "description": "TypeScript",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_typescript.svg"
+    },
+    {
+      "description": "JavaScript",
+      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_javascript.svg"
     },
     {
       "description": "Koin",
@@ -52,10 +88,6 @@
     {
       "description": "Github",
       "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_github.svg"
-    },
-    {
-      "description": "Figma",
-      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_figma.svg"
     },
     {
       "description": "Jira",
@@ -94,14 +126,6 @@
       "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_apollo.svg"
     },
     {
-      "description": "TypeScript",
-      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_typescript.svg"
-    },
-    {
-      "description": "JavaScript",
-      "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_javascript.svg"
-    },
-    {
       "description": "HTML",
       "imageUrl": "https://danielleitelima.github.io/resume/assets/ic_html.svg"
     },
@@ -133,7 +157,7 @@
         {
           "name": "Senior Android Developer",
           "period": "October 2023 - Now",
-          "description": "Currently contributing to a project for Charité, one of the largest hospitals in Europe, focusing on increasing engagement in a critical women's health study. Utilizing the latest Android technologies including Jetpack Compose, MVI architecture, Material Design 3. Additionally, applying those technologies in a Kotlin Multiplatform project."
+          "description": "Currently working on multiple projects in different platforms, such as web, iOS and Android. Previously worked on a project for Charité, one of the largest hospitals in Europe, focused on increasing engagement in a critical women's health study. Native android and ios development, Kotlin multiplatform, React.js, Vue.js and Golang are some of the technologies worked with in those projects."
         }
       ]
     },
@@ -232,7 +256,7 @@
     {
       "name": "German",
       "level": 1,
-      "description": "Basic"
+      "description": "Beginner"
     }
   ],
   "education": [
